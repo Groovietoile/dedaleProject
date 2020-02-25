@@ -197,9 +197,4 @@ public class MapRepresentation implements Serializable {
 		viewer.addDefaultView(true);
 		g.display();
 	}
-
-	public Graph getG() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

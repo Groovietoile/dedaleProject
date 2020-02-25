@@ -1,6 +1,9 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.util.List;
+
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -11,26 +14,29 @@ import jade.lang.acl.ACLMessage;
  * @author hc
  *
  */
-public class SayHello extends TickerBehaviour{
+public class SendInfoBehaviour extends TickerBehaviour{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2058134622078521998L;
+	private List<String> receivers;
 
 	/**
 	 * An agent tries to contact its friend and to give him its current position
 	 * @param myagent the agent who posses the behaviour
 	 *  
 	 */
-	public SayHello (final Agent myagent) {
+	public SendInfoBehaviour (final Agent myagent, List<String> receivers) {
 		super(myagent, 3000);
+		this.receivers = receivers;
 		//super(myagent);
 	}
 
 	@Override
 	public void onTick() {
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+		String myNextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
 
 		//A message is defined by : a performative, a sender, a set of receivers, (a protocol),(a content (and/or contentOBject))
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
@@ -39,14 +45,15 @@ public class SayHello extends TickerBehaviour{
 
 		if (myPosition!=""){
 			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to reach its friends");
-			msg.setContent("Hello World, I'm at "+myPosition);
-
-			msg.addReceiver(new AID("Collect1",AID.ISLOCALNAME));
-			msg.addReceiver(new AID("Collect2",AID.ISLOCALNAME));
+			msg.setContent(myAgent.getName() + ',' + myPosition + ',' + myNextNode);
+			
+			for (String receiver : this.receivers) {
+				msg.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+			}
 
 			//Mandatory to use this method (it takes into account the environment to decide if someone is reachable or not)
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-			System.out.println("Hello World, I'm at "+myPosition);
+			// System.out.println("Current : " + myPosition + " Next : " + myNextNode);
 		}
 	}
 }
