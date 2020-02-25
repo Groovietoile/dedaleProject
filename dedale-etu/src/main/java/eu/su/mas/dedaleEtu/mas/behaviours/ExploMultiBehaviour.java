@@ -1,5 +1,6 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,15 +10,17 @@ import java.util.Set;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
-import eu.su.mas.dedaleEtu.mas.agents.dummies.NotDummyAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreSoloAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.SimpleBehaviour;
+
 
 public class ExploMultiBehaviour extends SimpleBehaviour {
 
-	private static final long serialVersionUID = 2516237326966762071L;
-
+	private static final long serialVersionUID = 8567689731496787661L;
 
 	private boolean finished = false;
 
@@ -41,15 +44,11 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 		this.myMap=myMap;
 		this.openNodes=new ArrayList<String>();
 		this.closedNodes=new HashSet<String>();
-		System.out.println("helloooooooooo world");
 	}
-
 
 	@Override
 	public void action() {
-		
-		//vérifier si il y a quelqu'un
-		
+
 		if(this.myMap==null)
 			this.myMap= new MapRepresentation();
 		
@@ -97,6 +96,7 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 			if (this.openNodes.isEmpty()){
 				//Explo finished
 				finished=true;
+				//((ExploreMultiAgent)myAgent).getLb()[0].
 				System.out.println("Exploration successufully done, behaviour removed.");
 			}else{
 				//4) select next move.
@@ -116,7 +116,7 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 
 				//list of observations associated to the currentPosition
 				List<Couple<Observation,Integer>> lObservations= lobs.get(0).getRight();
-				System.out.println(this.myAgent.getLocalName()+" - State of the observations : "+lobs);
+				// System.out.println(this.myAgent.getLocalName()+" - State of the observations : "+lobs);
 				
 				//example related to the use of the backpack for the treasure hunt
 				Boolean b=false;
@@ -160,6 +160,7 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 				 * 				END API CALL ILUSTRATION
 				 *************************************************/
 				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
+				((ExploreMultiAgent)this.myAgent).setNextNode(nextNode);
 			}
 
 		}
@@ -171,3 +172,4 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 	}
 
 }
+

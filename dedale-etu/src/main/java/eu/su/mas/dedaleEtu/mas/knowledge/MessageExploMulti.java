@@ -1,4 +1,5 @@
 package eu.su.mas.dedaleEtu.mas.knowledge;
+
 import java.io.Serializable;
 
 public class MessageExploMulti implements Serializable {
