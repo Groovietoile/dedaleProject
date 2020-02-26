@@ -96,7 +96,6 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 			if (this.openNodes.isEmpty()){
 				//Explo finished
 				finished=true;
-				//((ExploreMultiAgent)myAgent).getLb()[0].
 				System.out.println("Exploration successufully done, behaviour removed.");
 			}else{
 				//4) select next move.

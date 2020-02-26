@@ -30,18 +30,6 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	private MapRepresentation myMap;
 	private List<String> listeAmis;
 	private String nextNode;
-	private List<Behaviour> lb;
-	
-
-	public String getNextNode() {
-		return nextNode;
-	}
-
-
-	public void setNextNode(String nextNode) {
-		this.nextNode = nextNode;
-	}
-
 
 	/**
 	 * This method is automatically called when "agent".start() is executed.
@@ -55,7 +43,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		super.setup();
 		
 		this.nextNode = null;
-		lb=new ArrayList<Behaviour>();
+		List<Behaviour> lb=new ArrayList<Behaviour>();
 		
 		/************************************************
 		 * 
@@ -85,15 +73,24 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		System.out.println("the  agent "+this.getLocalName()+ " is started");
 
 	}
+	
 
-
-	public List<Behaviour> getLb() {
-		return lb;
+	public String getNextNode() {
+		return nextNode;
 	}
 
 
-	public void setLb(List<Behaviour> lb) {
-		this.lb = lb;
+	public void setNextNode(String nextNode) {
+		this.nextNode = nextNode;
+	}
+	
+	public MapRepresentation getMyMap() {
+		return myMap;
+	}
+
+
+	public void setMyMap(MapRepresentation myMap) {
+		this.myMap = myMap;
 	}
 	
 }

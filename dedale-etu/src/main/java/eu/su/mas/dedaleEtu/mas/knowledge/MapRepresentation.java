@@ -171,6 +171,10 @@ public class MapRepresentation implements Serializable {
 		}
 		System.out.println("Loading done");
 	}
+	
+	public void mergeWith(MapRepresentation other) {
+		
+	}
 
 	/**
 	 * Method called before migration to kill all non serializable graphStream components
@@ -197,4 +201,5 @@ public class MapRepresentation implements Serializable {
 		viewer.addDefaultView(true);
 		g.display();
 	}
+	
 }
