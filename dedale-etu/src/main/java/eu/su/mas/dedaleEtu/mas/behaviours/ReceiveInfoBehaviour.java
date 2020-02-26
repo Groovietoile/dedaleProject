@@ -1,12 +1,17 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.io.IOException;
+
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
+import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 public class ReceiveInfoBehaviour extends TickerBehaviour {
 
@@ -22,15 +27,26 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 	@Override
 	public void onTick() {
 		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-		final String give_me_way_string = "Laisse-moi passer stp !";
+		final String giveMeWayString = "Laisse-moi passer stp !";
 
 		final ACLMessage msg = this.myAgent.receive(msgTemplate);
-		if (msg != null && !msg.getContent().startsWith(give_me_way_string)) {
-			String msgContent = msg.getContent();
-			String[] msgContentSplitted = msgContent.split(",");
-			String senderCurrentNode = msgContentSplitted[1], senderNextNode = msgContentSplitted[2],
+		ExploMultiAgentMessageContent msgContent;
+		if (msg != null) {
+			try {
+				msgContent = (ExploMultiAgentMessageContent)msg.getContentObject();
+			} catch (UnreadableException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return;
+			}
+		}
+		else { return; }
+		if (!msgContent.isGiveMeWay()) {
+			String senderCurrentNode = msgContent.getCurrentPosition(), senderNextNode = msgContent.getNextPosition(),
 				   myCurrentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition(),
 				   myNextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
+			MapRepresentation senderMap = msgContent.getMap();
+			// myAgent.mergeMap(senderMap);
 			// System.out.println(senderCurrentNode + ',' + myNextNode + ',' + senderNextNode + ',' + myCurrentNode);
 			// System.out.println(senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode));
 			if (senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode) && !myCurrentNode.equals(myNextNode)) {
@@ -96,19 +112,26 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 				}
 			}
 			if (senderCurrentNode.equals(senderNextNode) && senderCurrentNode.equals(myNextNode) && !myCurrentNode.equals(myNextNode)) {
-				System.out.println("Agent " + this.myAgent.getLocalName() + " : " + give_me_way_string);
-				ACLMessage msg_give_me_way=new ACLMessage(ACLMessage.INFORM);
-				msg_give_me_way.setSender(this.myAgent.getAID());
-				msg_give_me_way.setProtocol("UselessProtocol");
-				
-				msg_give_me_way.setContent(give_me_way_string + "," + myCurrentNode);
-				msg_give_me_way.addReceiver(msg.getSender());
+				System.out.println("Agent " + this.myAgent.getLocalName() + " : " + giveMeWayString);
+				ACLMessage msgGiveMeWay = new ACLMessage(ACLMessage.INFORM);
+				msgGiveMeWay.setSender(this.myAgent.getAID());
+				msgGiveMeWay.setProtocol("UselessProtocol");
 
-				((AbstractDedaleAgent)this.myAgent).sendMessage(msg_give_me_way);
+				MapRepresentation myMap = ((ExploreMultiAgent)this.myAgent).getMyMap();
+				try {
+					msgGiveMeWay.setContentObject(
+							new ExploMultiAgentMessageContent(myAgent.getLocalName(), myCurrentNode, myNextNode, myMap, true));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				msgGiveMeWay.addReceiver(msg.getSender());
+
+				((AbstractDedaleAgent)this.myAgent).sendMessage(msgGiveMeWay);
 			}
 		}
-		else if (msg != null) {
-			String senderCurrentNode = msg.getContent().split(",")[1];
+		else {
+			String senderCurrentNode = msgContent.getCurrentPosition();
 			String[] senderCurrentCoordsStr = senderCurrentNode.split("_"),
 					 myCurrentCoordsStr = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition().split("_");
 			int [] senderCurrentCoords = {Integer.parseInt(senderCurrentCoordsStr[0]), Integer.parseInt(senderCurrentCoordsStr[1])},

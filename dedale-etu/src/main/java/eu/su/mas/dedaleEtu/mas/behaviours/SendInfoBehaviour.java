@@ -1,9 +1,12 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.io.IOException;
 import java.util.List;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
+import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -37,15 +40,22 @@ public class SendInfoBehaviour extends TickerBehaviour{
 	public void onTick() {
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		String myNextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
+		MapRepresentation myMap = ((ExploreMultiAgent)this.myAgent).getMyMap();
 
 		//A message is defined by : a performative, a sender, a set of receivers, (a protocol),(a content (and/or contentOBject))
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setSender(this.myAgent.getAID());
 		msg.setProtocol("UselessProtocol");
 
-		if (myPosition!=""){
+		if (myPosition!="") {
+			ExploMultiAgentMessageContent msgContent = new ExploMultiAgentMessageContent(myAgent.getLocalName(), myPosition, myNextNode, myMap, false);
 			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to reach its friends");
-			msg.setContent(myAgent.getName() + ',' + myPosition + ',' + myNextNode);
+			try {
+				msg.setContentObject(msgContent);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			for (String receiver : this.receivers) {
 				msg.addReceiver(new AID(receiver, AID.ISLOCALNAME));
