@@ -2,7 +2,6 @@ package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
