@@ -1,1 +1,1 @@
-http://10.64.13.247:7778/acc
+http://ppti-14-408-07.ufr-info-p6.jussieu.fr:7778/acc

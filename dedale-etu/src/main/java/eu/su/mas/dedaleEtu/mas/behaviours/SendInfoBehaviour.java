@@ -6,6 +6,7 @@ import java.util.List;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.Agent;
@@ -41,14 +42,21 @@ public class SendInfoBehaviour extends TickerBehaviour{
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		String myNextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
 		MapRepresentation myMap = ((ExploreMultiAgent)this.myAgent).getMyMap();
-
+		MapMessage mapMsg = new MapMessage();
+		mapMsg = myMap.toMapMessage();
+		
 		//A message is defined by : a performative, a sender, a set of receivers, (a protocol),(a content (and/or contentOBject))
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setSender(this.myAgent.getAID());
 		msg.setProtocol("UselessProtocol");
 
 		if (myPosition!="") {
-			ExploMultiAgentMessageContent msgContent = new ExploMultiAgentMessageContent(myAgent.getLocalName(), myPosition, myNextNode, myMap, false);
+			if (myMap == null){
+				System.out.println("myMap == null !");
+			}
+			
+//			myMap.prepareMigration();
+			ExploMultiAgentMessageContent msgContent = new ExploMultiAgentMessageContent(myAgent.getLocalName(), myPosition, myNextNode, mapMsg, false);
 			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to reach its friends");
 			try {
 				msg.setContentObject(msgContent);

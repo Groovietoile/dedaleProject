@@ -2,8 +2,10 @@ package eu.su.mas.dedaleEtu.mas.knowledge;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.graphstream.algorithm.Dijkstra;
 import org.graphstream.graph.Edge;
@@ -16,6 +18,7 @@ import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.Viewer.CloseFramePolicy;
 
 import dataStructures.serializableGraph.*;
+import dataStructures.tuple.Couple;
 import javafx.application.Platform;
 
 /**
@@ -200,6 +203,38 @@ public class MapRepresentation implements Serializable {
 		viewer.setCloseFramePolicy(FxViewer.CloseFramePolicy.CLOSE_VIEWER);
 		viewer.addDefaultView(true);
 		g.display();
+	}
+
+	public MapMessage toMapMessage() {
+		MapMessage map = new MapMessage();
+		
+		HashMap<String, ArrayList<String>> listeNoeuds = new HashMap<String, ArrayList<String>>();
+		listeNoeuds.put("open", new ArrayList<String>());
+		listeNoeuds.put("closed", new ArrayList<String>());
+		Node[] noeuds = (Node[]) g.nodes().toArray();
+		Edge[] arcs = (Edge[]) g.edges().toArray();
+		ArrayList<Couple<String, String>>listeArcs = new ArrayList<Couple<String, String>>();
+		
+		for (Node n : noeuds) {
+			//liste noeuds
+			if (n.getAttribute("ui.class").equals("open")) {
+				listeNoeuds.get("open").add(n.getId());
+			}
+			else if (n.getAttribute("ui.class").equals("closed")) {
+				listeNoeuds.get("closed").add(n.getId());
+			}
+			else if (n.getAttribute("ui.class").equals("agent")) {
+				listeNoeuds.get("closed").add(n.getId());
+			}
+			//liste arcs
+			for (Edge e : arcs) {
+				listeArcs.add(new Couple<String, String>(e.getNode0().getId(),e.getNode1().getId()));
+			}
+		}
+		map.setListeDesNoeuds(listeNoeuds);
+		map.setListeDesArcs(listeArcs);
+
+		return map;
 	}
 	
 }

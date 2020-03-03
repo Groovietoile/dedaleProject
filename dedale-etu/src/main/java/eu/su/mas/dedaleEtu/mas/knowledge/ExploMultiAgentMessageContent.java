@@ -13,10 +13,10 @@ public class ExploMultiAgentMessageContent implements Serializable {
 	private String agentName;
 	private String currentPosition;
 	private String nextPosition;
-	private MapRepresentation map;
+	private MapMessage map;
 	private boolean giveMeWay;
 
-	public ExploMultiAgentMessageContent(String agentName, String currentPosition, String nextPosition, MapRepresentation map, boolean giveMeWay) {
+	public ExploMultiAgentMessageContent(String agentName, String currentPosition, String nextPosition, MapMessage map, boolean giveMeWay) {
 		this.agentName = agentName;
 		this.currentPosition = currentPosition;
 		this.nextPosition = nextPosition;
@@ -48,11 +48,11 @@ public class ExploMultiAgentMessageContent implements Serializable {
 		this.nextPosition = nextPosition;
 	}
 
-	public MapRepresentation getMap() {
+	public MapMessage getMap() {
 		return map;
 	}
 
-	public void setMap(MapRepresentation map) {
+	public void setMap(MapMessage map) {
 		this.map = map;
 	}
 	
