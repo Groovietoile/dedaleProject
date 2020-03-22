@@ -51,6 +51,7 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 
 		if(this.myMap==null)
 			this.myMap= new MapRepresentation();
+		this.myMap.mergeWith(((ExploreMultiAgent)this.myAgent).getMyMap());
 		
 		//0) Retrieve the current position
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
@@ -161,7 +162,7 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
 				((ExploreMultiAgent)this.myAgent).setNextNode(nextNode);
 //				System.out.println(myMap.toString());
-//				((ExploreMultiAgent)this.myAgent).setMyMap(myMap);
+				((ExploreMultiAgent)this.myAgent).mergeMap(this.myMap);
 
 			}
 

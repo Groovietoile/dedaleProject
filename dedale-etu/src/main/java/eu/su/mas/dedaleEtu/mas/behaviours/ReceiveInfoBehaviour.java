@@ -5,6 +5,7 @@ import java.io.IOException;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.Agent;
@@ -41,12 +42,12 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 			}
 		}
 		else { return; }
+		MapMessage senderMapMessage = msgContent.getMap();
+		((ExploreMultiAgent)this.myAgent).mergeMap(senderMapMessage);
 		if (!msgContent.isGiveMeWay()) {
 			String senderCurrentNode = msgContent.getCurrentPosition(), senderNextNode = msgContent.getNextPosition(),
 				   myCurrentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition(),
 				   myNextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
-			MapRepresentation senderMap = msgContent.getMap();
-			// myAgent.mergeMap(senderMap);
 			// System.out.println(senderCurrentNode + ',' + myNextNode + ',' + senderNextNode + ',' + myCurrentNode);
 			// System.out.println(senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode));
 			if (senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode) && !myCurrentNode.equals(myNextNode)) {
@@ -58,7 +59,7 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 					   senderNextCoords = {Integer.parseInt(senderNextCoordsStr[0]), Integer.parseInt(senderNextCoordsStr[1])},
 					   myCurrentCoords = {Integer.parseInt(myCurrentCoordsStr[0]), Integer.parseInt(myCurrentCoordsStr[1])},
 					   myNextCoords = {Integer.parseInt(myNextCoordsStr[0]), Integer.parseInt(myNextCoordsStr[1])};
-				if (myCurrentCoords[1] == senderCurrentCoords[1] && myCurrentCoords[0] == senderCurrentCoords[0]+1) {
+				if (myCurrentCoords[1] == senderCurrentCoords[1] && myCurrentCoords[0]+1 == senderCurrentCoords[0]) {
 					try {
 						this.myAgent.doWait(500); 
 						((AbstractDedaleAgent)this.myAgent).moveTo(Integer.toString(myCurrentCoords[0]) + "_" + Integer.toString(myCurrentCoords[1]+1));
@@ -71,7 +72,7 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 						System.out.println("Agent " + this.myAgent.getLocalName() + " : OK, j'attends !");
 					}
 				}
-				else if (myCurrentCoords[1] == senderCurrentCoords[1] && myCurrentCoords[0] == senderCurrentCoords[0]-1) {
+				else if (myCurrentCoords[1] == senderCurrentCoords[1] && myCurrentCoords[0]-1 == senderCurrentCoords[0]) {
 					try {
 						this.myAgent.doWait(500); 
 						((AbstractDedaleAgent)this.myAgent).moveTo(Integer.toString(myCurrentCoords[0]) + "_" + Integer.toString(myCurrentCoords[1]-1));
@@ -84,7 +85,7 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 						System.out.println("Agent " + this.myAgent.getLocalName() + " : OK, j'attends!");
 					}
 				}
-				else if (myCurrentCoords[0] == senderCurrentCoords[0] && myCurrentCoords[1] == senderCurrentCoords[1]-1) {
+				else if (myCurrentCoords[0] == senderCurrentCoords[0] && myCurrentCoords[1]-1 == senderCurrentCoords[1]) {
 					try {
 						this.myAgent.doWait(500); 
 						((AbstractDedaleAgent)this.myAgent).moveTo(Integer.toString(myCurrentCoords[0]+1) + "_" + Integer.toString(myCurrentCoords[1]));
@@ -97,7 +98,7 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 						System.out.println("Agent " + this.myAgent.getLocalName() + " : OK, j'attends!");
 					}
 				}
-				else if (myCurrentCoords[0] == senderCurrentCoords[0] && myCurrentCoords[1] == senderCurrentCoords[1]+1) {
+				else if (myCurrentCoords[0] == senderCurrentCoords[0] && myCurrentCoords[1]+1 == senderCurrentCoords[1]) {
 					try {
 						this.myAgent.doWait(500); 
 						((AbstractDedaleAgent)this.myAgent).moveTo(Integer.toString(myCurrentCoords[0]-1) + "_" + Integer.toString(myCurrentCoords[1]));
@@ -117,7 +118,7 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 				msgGiveMeWay.setSender(this.myAgent.getAID());
 				msgGiveMeWay.setProtocol("UselessProtocol");
 
-				MapRepresentation myMap = ((ExploreMultiAgent)this.myAgent).getMyMap();
+				MapMessage myMap = ((ExploreMultiAgent)this.myAgent).getMyMap();
 				try {
 					msgGiveMeWay.setContentObject(
 							new ExploMultiAgentMessageContent(myAgent.getLocalName(), myCurrentNode, myNextNode, myMap, true));

@@ -9,6 +9,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendInfoBehaviour;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -30,6 +31,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 	private MapRepresentation myMap;
 	private List<String> listeAmis;
 	private String nextNode;
+	private MapMessage myMapMessage;
 
 	/**
 	 * This method is automatically called when "agent".start() is executed.
@@ -44,6 +46,7 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		
 		this.nextNode = null;
 		List<Behaviour> lb=new ArrayList<Behaviour>();
+		this.myMapMessage = new MapMessage();
 		
 		/************************************************
 		 * 
@@ -84,13 +87,21 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 		this.nextNode = nextNode;
 	}
 	
-	public MapRepresentation getMyMap() {
-		return myMap;
+	public MapMessage getMyMap() {
+		return myMapMessage;
 	}
 
 
-	public void setMyMap(MapRepresentation myMap) {
-		this.myMap = myMap;
+	public void setMyMap(MapMessage myMap) {
+		this.myMapMessage = myMap;
+	}
+	
+	public void mergeMap(MapMessage otherMap) {
+		this.myMapMessage.mergeWith(otherMap);
+	}
+	
+	public void mergeMap(MapRepresentation otherMap) {
+		this.myMapMessage.mergeWith(otherMap);
 	}
 	
 }

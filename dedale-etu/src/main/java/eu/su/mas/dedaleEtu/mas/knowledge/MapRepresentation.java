@@ -53,6 +53,7 @@ public class MapRepresentation implements Serializable {
 	private String nodeStyle=defaultNodeStyle+nodeStyle_agent+nodeStyle_open;
 
 	private Graph g; //data structure non serializable
+
 	private Viewer viewer; //ref to the display,  non serializable
 	private Integer nbEdges;//used to generate the edges ids
 
@@ -71,6 +72,10 @@ public class MapRepresentation implements Serializable {
 		//this.viewer = this.g.display();
 
 		this.nbEdges=0;
+	}
+	
+	public Graph getG() {
+		return g;
 	}
 
 	/**
@@ -175,8 +180,22 @@ public class MapRepresentation implements Serializable {
 		System.out.println("Loading done");
 	}
 	
-	public void mergeWith(MapRepresentation other) {
-		
+	public void mergeWith(MapMessage other) {
+		if (other == null) { return; }
+		MapAttribute open = MapAttribute.open;
+		MapAttribute closed = MapAttribute.closed;
+		System.out.println("Liste de noeuds == null : " + (other.getListeDesNoeuds().get("closed") == null));
+		for (String idNode : other.getListeDesNoeuds().get("closed")) {
+			this.addNode(idNode, closed);
+		}
+		for (String idNode : other.getListeDesNoeuds().get("open")) {
+			if (this.g.getNode(idNode) == null) {
+				this.addNode(idNode, open);
+			}
+		}
+		for (Couple<String, String> arc : other.getListeDesArcs()) {
+			this.addEdge(arc.getLeft(), arc.getRight());
+		}
 	}
 
 	/**
@@ -193,6 +212,10 @@ public class MapRepresentation implements Serializable {
 			this.viewer=null;
 		}
 	}
+	
+	public void closeGuiPublic() {
+		closeGui();
+	}
 
 	/**
 	 * Method called after a migration to reopen GUI components
@@ -204,6 +227,10 @@ public class MapRepresentation implements Serializable {
 		viewer.addDefaultView(true);
 		g.display();
 	}
+	
+	public void openGuiPublic() {
+		openGui();
+	}
 
 	public MapMessage toMapMessage() {
 		MapMessage map = new MapMessage();
@@ -211,12 +238,13 @@ public class MapRepresentation implements Serializable {
 		HashMap<String, ArrayList<String>> listeNoeuds = new HashMap<String, ArrayList<String>>();
 		listeNoeuds.put("open", new ArrayList<String>());
 		listeNoeuds.put("closed", new ArrayList<String>());
-		Node[] noeuds = (Node[]) g.nodes().toArray();
-		Edge[] arcs = (Edge[]) g.edges().toArray();
+		Object[] noeuds = g.nodes().toArray();
+		Object[] arcs = g.edges().toArray();
 		ArrayList<Couple<String, String>>listeArcs = new ArrayList<Couple<String, String>>();
 		
-		for (Node n : noeuds) {
+		for (Object nObject : noeuds) {
 			//liste noeuds
+			Node n = (Node)nObject;
 			if (n.getAttribute("ui.class").equals("open")) {
 				listeNoeuds.get("open").add(n.getId());
 			}
@@ -226,10 +254,11 @@ public class MapRepresentation implements Serializable {
 			else if (n.getAttribute("ui.class").equals("agent")) {
 				listeNoeuds.get("closed").add(n.getId());
 			}
-			//liste arcs
-			for (Edge e : arcs) {
-				listeArcs.add(new Couple<String, String>(e.getNode0().getId(),e.getNode1().getId()));
-			}
+		}
+		// liste arcs
+		for (Object eObject : arcs) {
+			Edge e = (Edge)eObject;
+			listeArcs.add(new Couple<String, String>(e.getNode0().getId(),e.getNode1().getId()));
 		}
 		map.setListeDesNoeuds(listeNoeuds);
 		map.setListeDesArcs(listeArcs);

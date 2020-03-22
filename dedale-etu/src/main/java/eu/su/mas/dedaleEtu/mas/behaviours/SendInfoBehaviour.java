@@ -41,19 +41,18 @@ public class SendInfoBehaviour extends TickerBehaviour{
 	public void onTick() {
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		String myNextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
-		MapRepresentation myMap = ((ExploreMultiAgent)this.myAgent).getMyMap();
-		MapMessage mapMsg = new MapMessage();
-		mapMsg = myMap.toMapMessage();
+		MapMessage mapMsg = ((ExploreMultiAgent)this.myAgent).getMyMap();
 		
 		//A message is defined by : a performative, a sender, a set of receivers, (a protocol),(a content (and/or contentOBject))
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setSender(this.myAgent.getAID());
 		msg.setProtocol("UselessProtocol");
+		
+//		if (myMap == null) {
+//			System.out.println("myMap == null !");
+//		}
 
 		if (myPosition!="") {
-			if (myMap == null){
-				System.out.println("myMap == null !");
-			}
 			
 //			myMap.prepareMigration();
 			ExploMultiAgentMessageContent msgContent = new ExploMultiAgentMessageContent(myAgent.getLocalName(), myPosition, myNextNode, mapMsg, false);
