@@ -184,7 +184,6 @@ public class MapRepresentation implements Serializable {
 		if (other == null) { return; }
 		MapAttribute open = MapAttribute.open;
 		MapAttribute closed = MapAttribute.closed;
-		System.out.println("Liste de noeuds == null : " + (other.getListeDesNoeuds().get("closed") == null));
 		for (String idNode : other.getListeDesNoeuds().get("closed")) {
 			this.addNode(idNode, closed);
 		}
