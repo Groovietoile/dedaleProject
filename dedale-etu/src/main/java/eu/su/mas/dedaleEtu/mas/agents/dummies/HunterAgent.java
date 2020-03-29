@@ -6,6 +6,7 @@ import java.util.List;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.RandomWalkBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SayHello;
@@ -43,14 +44,7 @@ public class HunterAgent extends AbstractDedaleAgent {
 				this.listeAmis.add(listeAmisPrevisionnelle[i]);
 		}
 		
-		// lb.add(new TestOdeurBehaviour(this));
-		lb.add(new RandomWalkBehaviour(this));
-		lb.add(new SayHello(this));
-
-		
-//		lb.add(new SendInfoBehaviour(this, this.listeAmis));
-//		lb.add(new ReceiveInfoBehaviour(this));
-//		lb.add(new ExploMultiBehaviour(this, null));		
+		lb.add(new TestOdeurBehaviour(this));
 		
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
@@ -70,28 +64,4 @@ public class HunterAgent extends AbstractDedaleAgent {
 		this.myMapMessage = myMapMessage;
 	}
 	
-	/**
-	 * This method is automatically called after doDelete()
-	 */
-	protected void takeDown(){
-		super.takeDown();
-	}
-	
-	/**
-	 * This method is automatically called before migration. 
-	 * You can add here all the saving you need
-	 */
-	protected void beforeMove(){
-		super.beforeMove();
-	}
-	
-	/**
-	 * This method is automatically called after migration to reload. 
-	 * You can add here all the info regarding the state you want your agent to restart from 
-	 * 
-	 */
-	protected void afterMove(){
-		super.afterMove();
-	}
-
 }
