@@ -33,6 +33,7 @@ public class TestOdeurBehaviour extends SimpleBehaviour {
 			}
 			if (stench_existance) { break; }
 		}
+		
 		if (stench_existance) {
 			System.out.println("AGENT " + this.myAgent.getLocalName() + obsRes);
 		}

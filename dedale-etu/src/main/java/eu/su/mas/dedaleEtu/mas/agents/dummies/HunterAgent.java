@@ -7,6 +7,7 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.FollowGolemBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.RandomWalkBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SayHello;
@@ -15,21 +16,22 @@ import eu.su.mas.dedaleEtu.mas.behaviours.TestOdeurBehaviour;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import jade.core.behaviours.Behaviour;
 
-public class HunterAgent extends AbstractDedaleAgent {
+public class HunterAgent extends AbstractExploreMultiAgent {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5053345286495358254L;
-	private MapMessage myMapMessage;
-	private List<String> listeAmis; 
-	
+	private List<String> listeAmis;
+	private boolean followingGolem;
+
 	protected void setup() {
 
 		super.setup();
 		
 		List<Behaviour> lb=new ArrayList<Behaviour>();
-		this.setMyMapMessage(new MapMessage());
+		this.myMapMessage = new MapMessage();
+		this.followingGolem = false;
 		
 		/************************************************
 		 * 
@@ -44,8 +46,9 @@ public class HunterAgent extends AbstractDedaleAgent {
 				this.listeAmis.add(listeAmisPrevisionnelle[i]);
 		}
 		
-		lb.add(new TestOdeurBehaviour(this));
-		
+		lb.add(new FollowGolemBehaviour(this));
+		lb.add(new ExploMultiBehaviour(this, null));
+		// lb.add(new ExploMultiBehaviour(this, null));
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
 		 */
@@ -62,6 +65,14 @@ public class HunterAgent extends AbstractDedaleAgent {
 
 	public void setMyMapMessage(MapMessage myMapMessage) {
 		this.myMapMessage = myMapMessage;
+	}
+	
+	public boolean isFollowingGolem() {
+		return followingGolem;
+	}
+
+	public void setFollowingGolem(boolean followingGolem) {
+		this.followingGolem = followingGolem;
 	}
 	
 }

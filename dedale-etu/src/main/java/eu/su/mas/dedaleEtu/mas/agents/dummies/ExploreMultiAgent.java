@@ -25,13 +25,11 @@ import jade.core.behaviours.Behaviour;
  *
  */
 
-public class ExploreMultiAgent extends AbstractDedaleAgent {
+public class ExploreMultiAgent extends AbstractExploreMultiAgent {
 
 	private static final long serialVersionUID = -6431752665590433727L;
 	private MapRepresentation myMap;
 	private List<String> listeAmis;
-	private String nextNode;
-	private MapMessage myMapMessage;
 
 	/**
 	 * This method is automatically called when "agent".start() is executed.
@@ -77,31 +75,5 @@ public class ExploreMultiAgent extends AbstractDedaleAgent {
 
 	}
 	
-
-	public String getNextNode() {
-		return nextNode;
-	}
-
-
-	public void setNextNode(String nextNode) {
-		this.nextNode = nextNode;
-	}
-	
-	public MapMessage getMyMap() {
-		return myMapMessage;
-	}
-
-
-	public void setMyMap(MapMessage myMap) {
-		this.myMapMessage = myMap;
-	}
-	
-	public void mergeMap(MapMessage otherMap) {
-		this.myMapMessage.mergeWith(otherMap);
-	}
-	
-	public void mergeMap(MapRepresentation otherMap) {
-		this.myMapMessage.mergeWith(otherMap);
-	}
 	
 }

@@ -10,8 +10,9 @@ import java.util.Set;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
-import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreSoloAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import jade.core.behaviours.Behaviour;
@@ -48,10 +49,19 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 
 	@Override
 	public void action() {
+		
+		try {
+			if (((HunterAgent)this.myAgent).isFollowingGolem()) { return; }
+		}
+		catch(Exception e) {
+			if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
+				System.out.println(e.getMessage());
+			}
+		}
 
 		if(this.myMap==null)
 			this.myMap= new MapRepresentation();
-		this.myMap.mergeWith(((ExploreMultiAgent)this.myAgent).getMyMap());
+		this.myMap.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap());
 		
 		//0) Retrieve the current position
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
@@ -160,9 +170,9 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 				 * 				END API CALL ILUSTRATION
 				 *************************************************/
 				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
-				((ExploreMultiAgent)this.myAgent).setNextNode(nextNode);
+				((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
 //				System.out.println(myMap.toString());
-				((ExploreMultiAgent)this.myAgent).mergeMap(this.myMap);
+				((AbstractExploreMultiAgent)this.myAgent).mergeMap(this.myMap);
 
 			}
 
