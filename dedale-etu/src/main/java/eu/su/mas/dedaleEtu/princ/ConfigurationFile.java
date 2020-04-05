@@ -62,7 +62,7 @@ public final class ConfigurationFile {
 	// public static String INSTANCE_TOPOLOGY=null;
 	
 	//TP5
-	public static String INSTANCE_TOPOLOGY="resources/topology/BinaryTree1";
+	public static String INSTANCE_TOPOLOGY="resources/topology/BinaryTree2";
 	
 	// Other topologies
 	//public static String INSTANCE_TOPOLOGY="resources/topology/map2018-topology-ica";

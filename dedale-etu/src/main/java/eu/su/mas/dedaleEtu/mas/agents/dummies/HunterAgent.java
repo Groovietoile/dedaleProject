@@ -10,6 +10,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.FollowGolemBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.RandomWalkBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoHunterBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SayHello;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.TestOdeurBehaviour;
@@ -46,6 +47,8 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 				this.listeAmis.add(listeAmisPrevisionnelle[i]);
 		}
 		
+		lb.add(new SendInfoBehaviour(this, this.listeAmis));
+		lb.add(new ReceiveInfoHunterBehaviour(this));
 		lb.add(new FollowGolemBehaviour(this));
 		lb.add(new ExploMultiBehaviour(this, null));
 		// lb.add(new ExploMultiBehaviour(this, null));

@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
-import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreMultiAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
-import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -39,9 +39,19 @@ public class SendInfoBehaviour extends TickerBehaviour{
 
 	@Override
 	public void onTick() {
+		
+		try {
+			if (((HunterAgent)this.myAgent).isFollowingGolem()) { return; }
+		}
+		catch(Exception e) {
+			if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
+				System.out.println(e.getMessage());
+			}
+		}
+
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-		String myNextNode = ((ExploreMultiAgent)this.myAgent).getNextNode();
-		MapMessage mapMsg = ((ExploreMultiAgent)this.myAgent).getMyMap();
+		String myNextNode = ((AbstractExploreMultiAgent)this.myAgent).getNextNode();
+		MapMessage mapMsg = ((AbstractExploreMultiAgent)this.myAgent).getMyMap();
 		
 		//A message is defined by : a performative, a sender, a set of receivers, (a protocol),(a content (and/or contentOBject))
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
