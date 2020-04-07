@@ -13,6 +13,7 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.ExploreSoloAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent.AgentRole;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import jade.core.behaviours.Behaviour;
@@ -51,7 +52,10 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 	public void action() {
 		
 		try {
-			if (((HunterAgent)this.myAgent).isFollowingGolem()) { return; }
+			if (!((HunterAgent)this.myAgent).isExploring()) {
+//				System.out.println("AGENT " + this.myAgent.getLocalName() + " J'AI TROUVÉ UN GOLEM !");
+				return; 
+			}
 		}
 		catch(Exception e) {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
@@ -108,6 +112,14 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 				//Explo finished
 				finished=true;
 				System.out.println("Exploration successufully done, behaviour removed.");
+				try {
+					((HunterAgent)this.myAgent).setRole(AgentRole.returning);
+				}
+				catch(Exception e) {
+					if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
+						System.out.println(e.getMessage());
+					}
+				}
 			}else{
 				//4) select next move.
 				//4.1 If there exist one open node directly reachable, go for it,

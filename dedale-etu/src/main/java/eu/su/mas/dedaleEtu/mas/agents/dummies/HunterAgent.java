@@ -11,6 +11,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.FollowGolemBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.RandomWalkBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoHunterBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.ReturnBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SayHello;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.TestOdeurBehaviour;
@@ -22,9 +23,26 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	/**
 	 * 
 	 */
+	public static enum AgentRole {
+		exploring,
+		following,
+		blocking,
+		waiting,
+		returning,
+		patrolling;
+	}
 	private static final long serialVersionUID = 5053345286495358254L;
 	private List<String> listeAmis;
 	private boolean followingGolem;
+	private AgentRole role;
+	
+	public AgentRole getRole() {
+		return role;
+	}
+
+	public void setRole(AgentRole role) {
+		this.role = role;
+	}
 
 	protected void setup() {
 
@@ -33,6 +51,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 		this.myMapMessage = new MapMessage();
 		this.followingGolem = false;
+		this.role = AgentRole.exploring;
 		
 		/************************************************
 		 * 
@@ -51,6 +70,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		lb.add(new ReceiveInfoHunterBehaviour(this));
 		lb.add(new FollowGolemBehaviour(this));
 		lb.add(new ExploMultiBehaviour(this, null));
+		lb.add(new ReturnBehaviour(this));
 		// lb.add(new ExploMultiBehaviour(this, null));
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
@@ -71,11 +91,19 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	}
 	
 	public boolean isFollowingGolem() {
-		return followingGolem;
+		return this.role == AgentRole.following;
+	}
+	
+	public boolean isExploring() {
+		return this.role == AgentRole.exploring;
+	}
+	
+	public boolean isReturning() {
+		return this.role == AgentRole.returning;
 	}
 
-	public void setFollowingGolem(boolean followingGolem) {
-		this.followingGolem = followingGolem;
-	}
+//	public void setFollowingGolem(boolean followingGolem) {
+//		this.followingGolem = followingGolem;
+//	}
 	
 }

@@ -31,7 +31,7 @@ public class ReceiveInfoHunterBehaviour extends TickerBehaviour {
 	public void onTick() {
 		
 		try {
-			if (((HunterAgent)this.myAgent).isFollowingGolem()) { return; }
+			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) { return; }
 		}
 		catch(Exception e) {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
@@ -64,44 +64,7 @@ public class ReceiveInfoHunterBehaviour extends TickerBehaviour {
 			// System.out.println(senderCurrentNode + ',' + myNextNode + ',' + senderNextNode + ',' + myCurrentNode);
 			// System.out.println(senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode));
 			if (senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode) && !myCurrentNode.equals(myNextNode)) {
-				MapMessage myMap = ((AbstractExploreMultiAgent)this.myAgent).getMyMap();
-				ArrayList<String> currentNodeOpenNeighbours = new ArrayList<String>(),
-						currentNodeClosedNeighbours = new ArrayList<String>();
-				for (Couple<String, String> edge : myMap.getListeDesArcs()) {
-					if (edge.getLeft().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("open").contains(edge.getRight())) {
-						currentNodeOpenNeighbours.add(edge.getRight());
-					}
-					else if (edge.getLeft().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("closed").contains(edge.getRight())) {
-						currentNodeClosedNeighbours.add(edge.getRight());
-					}
-					else if (edge.getRight().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("open").contains(edge.getLeft())) {
-						currentNodeOpenNeighbours.add(edge.getLeft());
-					}
-					else if (edge.getRight().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("closed").contains(edge.getLeft())) {
-						currentNodeClosedNeighbours.add(edge.getLeft());
-					}
-				}
-				
-				String neighbourRandom = "";
-				Integer neighbourRandomIndex = 0;
-				while (true) {
-					neighbourRandomIndex = new Random().nextInt(currentNodeOpenNeighbours.size());
-					neighbourRandom = currentNodeOpenNeighbours.get(neighbourRandomIndex);
-					if (!neighbourRandom.equals(senderCurrentNode) || (currentNodeOpenNeighbours.size() + currentNodeClosedNeighbours.size()) == 1) { break; }
-				}
-				if (neighbourRandom.equals(senderCurrentNode)) {
-					while (true) {
-						neighbourRandomIndex = new Random().nextInt(currentNodeClosedNeighbours.size());
-						neighbourRandom = currentNodeClosedNeighbours.get(neighbourRandomIndex);
-						if (!neighbourRandom.equals(senderCurrentNode) || (currentNodeOpenNeighbours.size() + currentNodeClosedNeighbours.size()) == 1) { break; }
-					}
-					
-				}
-				if (!neighbourRandom.equals(senderCurrentNode)) {
-					((AbstractDedaleAgent)this.myAgent).moveTo(neighbourRandom);
-				}
-				else { noNeighbours = true; }
-				
+				noNeighbours = !this.giveWay(myCurrentNode, senderCurrentNode);
 			}
 			if ((senderCurrentNode.equals(senderNextNode) && senderCurrentNode.equals(myNextNode) && !myCurrentNode.equals(myNextNode)) || noNeighbours) {
 				System.out.println("Agent " + this.myAgent.getLocalName() + " : " + giveMeWayString);
@@ -125,46 +88,7 @@ public class ReceiveInfoHunterBehaviour extends TickerBehaviour {
 		else {
 			String senderCurrentNode = msgContent.getCurrentPosition();
 			String myCurrentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-			boolean done = false;
-			MapMessage myMap = ((AbstractExploreMultiAgent)this.myAgent).getMyMap();
-			ArrayList<String> currentNodeOpenNeighbours = new ArrayList<String>(),
-					currentNodeClosedNeighbours = new ArrayList<String>();
-			for (Couple<String, String> edge : myMap.getListeDesArcs()) {
-				if (edge.getLeft().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("open").contains(edge.getRight())) {
-					currentNodeOpenNeighbours.add(edge.getRight());
-				}
-				else if (edge.getLeft().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("closed").contains(edge.getRight())) {
-					currentNodeClosedNeighbours.add(edge.getRight());
-				}
-				else if (edge.getRight().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("open").contains(edge.getLeft())) {
-					currentNodeOpenNeighbours.add(edge.getLeft());
-				}
-				else if (edge.getRight().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("closed").contains(edge.getLeft())) {
-					currentNodeClosedNeighbours.add(edge.getLeft());
-				}
-			}
-			
-			String neighbourRandom = "";
-			Integer neighbourRandomIndex = 0;
-			while (true) {
-				neighbourRandomIndex = new Random().nextInt(currentNodeOpenNeighbours.size());
-				neighbourRandom = currentNodeOpenNeighbours.get(neighbourRandomIndex);
-				if (!neighbourRandom.equals(senderCurrentNode) || (currentNodeOpenNeighbours.size() + currentNodeClosedNeighbours.size()) == 1) { break; }
-			}
-			if (neighbourRandom.equals(senderCurrentNode)) {
-				while (true) {
-					neighbourRandomIndex = new Random().nextInt(currentNodeClosedNeighbours.size());
-					neighbourRandom = currentNodeClosedNeighbours.get(neighbourRandomIndex);
-					if (!neighbourRandom.equals(senderCurrentNode) || (currentNodeOpenNeighbours.size() + currentNodeClosedNeighbours.size()) == 1) { break; }
-				}
-				
-			}
-			if (!neighbourRandom.equals(senderCurrentNode)) {
-				((AbstractDedaleAgent)this.myAgent).moveTo(neighbourRandom);
-				done = true;
-			}
-			else { noNeighbours = true; }
-
+			boolean done = this.giveWay(myCurrentNode, senderCurrentNode);
 			if (done) {
 				System.out.println("Vas-y !");
 			}
@@ -174,5 +98,58 @@ public class ReceiveInfoHunterBehaviour extends TickerBehaviour {
 			((AbstractExploreMultiAgent)this.myAgent).setNextNode(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 		}
 		
+	}
+	
+	private boolean giveWay(String myCurrentNode, String senderCurrentNode) {
+		boolean success = true;
+		MapMessage myMap = ((AbstractExploreMultiAgent)this.myAgent).getMyMap();
+		ArrayList<String> currentNodeOpenNeighbours = new ArrayList<String>(),
+				currentNodeClosedNeighbours = new ArrayList<String>();
+		for (Couple<String, String> edge : myMap.getListeDesArcs()) {
+			if (edge.getLeft().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("open").contains(edge.getRight())) {
+				currentNodeOpenNeighbours.add(edge.getRight());
+			}
+			else if (edge.getLeft().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("closed").contains(edge.getRight())) {
+				currentNodeClosedNeighbours.add(edge.getRight());
+			}
+			else if (edge.getRight().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("open").contains(edge.getLeft())) {
+				currentNodeOpenNeighbours.add(edge.getLeft());
+			}
+			else if (edge.getRight().equals(myCurrentNode) && myMap.getListeDesNoeuds().get("closed").contains(edge.getLeft())) {
+				currentNodeClosedNeighbours.add(edge.getLeft());
+			}
+		}
+		
+		String neighbourRandom = "", neighbourTemp = "";
+		Integer neighbourRandomIndex = -1, indexTemp = -1;
+
+		while (currentNodeOpenNeighbours.size() > 0) {
+			indexTemp = new Random().nextInt(currentNodeOpenNeighbours.size());
+			neighbourTemp = currentNodeOpenNeighbours.get(indexTemp);
+			if (!neighbourTemp.equals(senderCurrentNode)) {
+				neighbourRandomIndex = indexTemp;
+				neighbourRandom = neighbourTemp;
+				break;
+			}
+			if (currentNodeOpenNeighbours.size() == 1) { break; }
+			
+		}
+		if (neighbourRandomIndex == -1) {
+			while (currentNodeClosedNeighbours.size() > 0) {
+				indexTemp = new Random().nextInt(currentNodeClosedNeighbours.size());
+				neighbourTemp = currentNodeClosedNeighbours.get(indexTemp);
+				if (!neighbourTemp.equals(senderCurrentNode)) {
+					neighbourRandomIndex = indexTemp;
+					neighbourRandom = neighbourTemp;
+					break;
+				}
+				if (currentNodeClosedNeighbours.size() == 1) { break; }
+			}
+		}
+		if (neighbourRandomIndex != -1) {
+			((AbstractDedaleAgent)this.myAgent).moveTo(neighbourRandom);
+		}
+		else { success = false; }
+		return success;
 	}
 }

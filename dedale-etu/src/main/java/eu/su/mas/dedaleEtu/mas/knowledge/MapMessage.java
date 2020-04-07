@@ -3,9 +3,14 @@ package eu.su.mas.dedaleEtu.mas.knowledge;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
+import org.graphstream.algorithm.Dijkstra;
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
 
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
@@ -110,6 +115,35 @@ public class MapMessage implements Serializable {
 			if (this.listeDesArcs.contains((Object)arc) || this.listeDesArcs.contains((Object)arc_inv)) { continue; }
 			this.listeDesArcs.add(arc);
 		}
+	}
+	
+	public List<String> getShortestPath(String idFrom, String idTo) {
+		List<String> shortestPath=new ArrayList<String>();
+
+		Dijkstra dijkstra = new Dijkstra();//number of edge
+
+		Graph g = new SingleGraph("graph_temp");
+		for (ArrayList<String> nodes : this.listeDesNoeuds.values())
+			for (String n : nodes)
+				g.addNode(n);
+		for (Couple<String, String> edge : this.listeDesArcs)
+			g.addEdge("(" + edge.getLeft() + ", " + edge.getRight() + ")", edge.getLeft(), edge.getRight());
+
+		dijkstra.init(g);
+		dijkstra.setSource(g.getNode(idFrom));
+		dijkstra.compute();//compute the distance to all nodes from idFrom
+		List<Node> path=dijkstra.getPath(g.getNode(idTo)).getNodePath(); //the shortest path from idFrom to idTo
+		Iterator<Node> iter=path.iterator();
+		while (iter.hasNext()){
+			shortestPath.add(iter.next().getId());
+		}
+		dijkstra.clear();
+		shortestPath.remove(0);//remove the current position
+		return shortestPath;
+	}
+	
+	public String getCenter() {
+		return "0";
 	}
 	
 }

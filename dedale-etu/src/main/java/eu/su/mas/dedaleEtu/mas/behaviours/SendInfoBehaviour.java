@@ -41,7 +41,7 @@ public class SendInfoBehaviour extends TickerBehaviour{
 	public void onTick() {
 		
 		try {
-			if (((HunterAgent)this.myAgent).isFollowingGolem()) { return; }
+			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) { return; }
 		}
 		catch(Exception e) {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
