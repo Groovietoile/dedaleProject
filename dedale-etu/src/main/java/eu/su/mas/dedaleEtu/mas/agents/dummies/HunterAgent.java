@@ -15,6 +15,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.ReturnBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SayHello;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.TestOdeurBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.WaitingBehaviour;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import jade.core.behaviours.Behaviour;
 
@@ -71,6 +72,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		lb.add(new FollowGolemBehaviour(this));
 		lb.add(new ExploMultiBehaviour(this, null));
 		lb.add(new ReturnBehaviour(this));
+		lb.add(new WaitingBehaviour(this));
 		// lb.add(new ExploMultiBehaviour(this, null));
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
@@ -80,6 +82,14 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		addBehaviour(new startMyBehaviours(this,lb));
 		
 		System.out.println("the  agent "+this.getLocalName()+ " is started");
+	}
+
+	public List<String> getListeAmis() {
+		return listeAmis;
+	}
+
+	public void setListeAmis(List<String> listeAmis) {
+		this.listeAmis = listeAmis;
 	}
 
 	public MapMessage getMyMapMessage() {
@@ -100,6 +110,10 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	
 	public boolean isReturning() {
 		return this.role == AgentRole.returning;
+	}
+	
+	public boolean isWaiting() {
+		return this.role == AgentRole.waiting;
 	}
 
 //	public void setFollowingGolem(boolean followingGolem) {

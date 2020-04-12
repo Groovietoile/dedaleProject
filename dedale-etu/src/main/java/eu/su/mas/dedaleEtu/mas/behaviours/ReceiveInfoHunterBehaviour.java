@@ -11,27 +11,32 @@ import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import jade.core.Agent;
+import jade.core.behaviours.SimpleBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 // TODO REFACTOR THIS
-public class ReceiveInfoHunterBehaviour extends TickerBehaviour {
+public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2401517043351791117L;
+	private boolean finished = false;
 
 	public ReceiveInfoHunterBehaviour(Agent myAgent) {
-		super(myAgent, 500);
+		super(myAgent);
 	}
 
 	@Override
-	public void onTick() {
+	public void action() {
 		
 		try {
-			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) { return; }
+			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) {
+				this.finished = true;
+				return;
+			}
 		}
 		catch(Exception e) {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
@@ -151,5 +156,10 @@ public class ReceiveInfoHunterBehaviour extends TickerBehaviour {
 		}
 		else { success = false; }
 		return success;
+	}
+
+	@Override
+	public boolean done() {
+		return this.finished;
 	}
 }

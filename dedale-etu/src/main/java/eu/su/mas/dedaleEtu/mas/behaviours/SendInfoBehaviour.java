@@ -18,7 +18,7 @@ import jade.lang.acl.ACLMessage;
  * @author hc
  *
  */
-public class SendInfoBehaviour extends TickerBehaviour{
+public class SendInfoBehaviour extends TickerBehaviour {
 
 	/**
 	 * 
@@ -41,7 +41,10 @@ public class SendInfoBehaviour extends TickerBehaviour{
 	public void onTick() {
 		
 		try {
-			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) { return; }
+			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) {
+				this.stop();
+				return;
+			}
 		}
 		catch(Exception e) {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException")) {
@@ -83,4 +86,5 @@ public class SendInfoBehaviour extends TickerBehaviour{
 			// System.out.println("Current : " + myPosition + " Next : " + myNextNode);
 		}
 	}
+	
 }

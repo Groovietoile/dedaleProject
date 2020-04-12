@@ -303,7 +303,7 @@ public class Principal {
 //		//4) Give the class name of your agent to let the system instantiate it
 //		ag=createNewDedaleAgent(c, agentName, DummyMovingAgent.class.getName(), entityParameters);
 //		agentList.add(ag);	
-//		
+//	
 //		
 //		/*********
 //		 * AGENT Collect

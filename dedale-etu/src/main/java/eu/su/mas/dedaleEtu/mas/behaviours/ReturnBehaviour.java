@@ -6,8 +6,12 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent.AgentRole;
+import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 public class ReturnBehaviour extends SimpleBehaviour {
 
@@ -28,13 +32,25 @@ public class ReturnBehaviour extends SimpleBehaviour {
 
 	@Override
 	public void action() {
-		// System.out.println(((HunterAgent)this.myAgent).getRole());
 		try {
 			if (!((HunterAgent)this.myAgent).isReturning()) { return; }
 		}
 		catch(Exception e) {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException"))
 				System.out.println(e.getMessage());
+		}
+		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+		final ACLMessage msg = this.myAgent.receive(msgTemplate);
+		if (msg != null) {
+			try {
+				String msgContent = msg.getContent();
+				if (msgContent.equals(WaitingBehaviour.iAmWaiting)) {
+					System.out.println("Agent " + this.myAgent.getLocalName() + " OK DONNE-MOI SOUS PARTIE ALORS ! ");
+					((HunterAgent)this.myAgent).setRole(AgentRole.patrolling);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		String currentPosition = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		if (currentPosition.equals(this.center)) {
@@ -46,12 +62,15 @@ public class ReturnBehaviour extends SimpleBehaviour {
 			this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(currentPosition, this.center);
 		if (this.path.size() > 0) {
 			try {
+				this.myAgent.doWait(500);
 				((AbstractDedaleAgent)this.myAgent).moveTo(this.path.get(0));
 				this.path.remove(0);
 			}
-			catch (RuntimeException e) {
+			catch (Exception e) {
+				this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(currentPosition, this.center);
 				System.out.println(currentPosition);
 				System.out.println(path);
+				e.printStackTrace();
 			}
 		}
 		
