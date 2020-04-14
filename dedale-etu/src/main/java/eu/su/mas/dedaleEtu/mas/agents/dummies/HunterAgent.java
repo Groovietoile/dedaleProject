@@ -8,6 +8,7 @@ import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.FollowGolemBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.PatrollingBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.RandomWalkBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveInfoHunterBehaviour;
@@ -36,6 +37,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	private List<String> listeAmis;
 	private boolean followingGolem;
 	private AgentRole role;
+	private Integer indexPatrolling;
 	
 	public AgentRole getRole() {
 		return role;
@@ -53,6 +55,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		this.myMapMessage = new MapMessage();
 		this.followingGolem = false;
 		this.role = AgentRole.exploring;
+		this.indexPatrolling = -1;
 		
 		/************************************************
 		 * 
@@ -73,6 +76,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		lb.add(new ExploMultiBehaviour(this, null));
 		lb.add(new ReturnBehaviour(this));
 		lb.add(new WaitingBehaviour(this));
+		lb.add(new PatrollingBehaviour(this));
 		// lb.add(new ExploMultiBehaviour(this, null));
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
@@ -114,6 +118,18 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	
 	public boolean isWaiting() {
 		return this.role == AgentRole.waiting;
+	}
+	
+	public boolean isPatrolling() {
+		return this.role == AgentRole.patrolling;
+	}
+
+	public Integer getIndexPatrolling() {
+		return indexPatrolling;
+	}
+
+	public void setIndexPatrolling(Integer indexPatrolling) {
+		this.indexPatrolling = indexPatrolling;
 	}
 
 //	public void setFollowingGolem(boolean followingGolem) {

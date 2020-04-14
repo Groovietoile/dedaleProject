@@ -52,9 +52,9 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 		if (msg != null) {
 			try {
 				msgContent = (ExploMultiAgentMessageContent)msg.getContentObject();
-			} catch (UnreadableException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				// e1.printStackTrace();
 				return;
 			}
 		}

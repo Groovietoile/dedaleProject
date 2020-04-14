@@ -2,6 +2,7 @@ package eu.su.mas.dedaleEtu.mas.knowledge;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import dataStructures.tuple.Couple;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 
 public class MapMessage implements Serializable {
@@ -143,7 +145,33 @@ public class MapMessage implements Serializable {
 	}
 	
 	public String getCenter() {
-		return "0";
+		return "5";
+	}
+	
+	public List<String> getNodeNeighbours(String idNode) {
+		List<String> neighbours = new ArrayList<String>();
+		for (Couple<String, String> edge : this.listeDesArcs) {
+			if (edge.getLeft().equals(idNode))
+				neighbours.add(edge.getRight());
+			if (edge.getRight().equals(idNode))
+				neighbours.add(edge.getLeft());
+		}
+		neighbours.sort(new StringCustomComparator());
+		return neighbours;
+	}
+	
+	public class StringCustomComparator implements Comparator<String> {
+		
+		public StringCustomComparator() {
+			
+		}
+
+		@Override
+		public int compare(String o1, String o2) {
+			// TODO Auto-generated method stub
+			return o1.compareTo(o2);
+		}
+
 	}
 	
 }

@@ -22,12 +22,15 @@ public class ReturnBehaviour extends SimpleBehaviour {
 	private boolean finished;
 	private String center;
 	private List<String> path;
+	private List<String> centerNeighbours;
+	public static final String demandSubTree = "OK DONNE-MOI SOUS PARTIE ALORS !";
 
 	public ReturnBehaviour(final AbstractDedaleAgent myAgent) {
 		super(myAgent);
 		this.finished = false;
 		this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
 		this.path = null;
+		this.centerNeighbours = null;
 	}
 
 	@Override
@@ -45,7 +48,19 @@ public class ReturnBehaviour extends SimpleBehaviour {
 			try {
 				String msgContent = msg.getContent();
 				if (msgContent.equals(WaitingBehaviour.iAmWaiting)) {
-					System.out.println("Agent " + this.myAgent.getLocalName() + " OK DONNE-MOI SOUS PARTIE ALORS ! ");
+					ACLMessage msgDemandSubTree = new ACLMessage(ACLMessage.INFORM);
+					msgDemandSubTree.setSender(this.myAgent.getAID());
+					msgDemandSubTree.setProtocol("UselessProtocol");
+					msgDemandSubTree.setContent(demandSubTree);
+					msgDemandSubTree.addReceiver(msg.getSender());
+					((AbstractDedaleAgent)this.myAgent).sendMessage(msgDemandSubTree);
+				}
+				else {
+					Integer indexPatrolling = Integer.parseInt(msgContent);
+//					this.updateCenterNeighbours();
+//					System.out.println("BRANCH TO PATROLL: " + indexPatrolling);
+//					System.out.println("SO NODE TO START IS: " + this.centerNeighbours.get(indexPatrolling));
+					((HunterAgent)this.myAgent).setIndexPatrolling(indexPatrolling);
 					((HunterAgent)this.myAgent).setRole(AgentRole.patrolling);
 				}
 			} catch (Exception e) {
@@ -74,6 +89,11 @@ public class ReturnBehaviour extends SimpleBehaviour {
 			}
 		}
 		
+	}
+	
+	public void updateCenterNeighbours() {
+		if (this.centerNeighbours == null)
+			this.centerNeighbours = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getNodeNeighbours(this.center);
 	}
 
 	@Override
