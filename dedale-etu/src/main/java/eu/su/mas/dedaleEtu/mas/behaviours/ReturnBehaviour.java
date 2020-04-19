@@ -1,6 +1,8 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
@@ -46,21 +48,25 @@ public class ReturnBehaviour extends SimpleBehaviour {
 		final ACLMessage msg = this.myAgent.receive(msgTemplate);
 		if (msg != null) {
 			try {
-				String msgContent = msg.getContent();
-				if (msgContent.equals(WaitingBehaviour.iAmWaiting)) {
-					ACLMessage msgDemandSubTree = new ACLMessage(ACLMessage.INFORM);
+				Serializable msgContent = msg.getContentObject();
+				boolean isContentList = false;
+				List<Integer> contentList = new ArrayList<Integer>();
+				try {
+					contentList = (ArrayList<Integer>) msgContent;
+					isContentList = true;
+				}
+				catch (Exception e) {}
+				if (!isContentList  && msgContent.equals(WaitingBehaviour.iAmWaiting)) {
+					ACLMessage msgDemandSubTree = new ACLMessage(ACLMessage.REQUEST);
 					msgDemandSubTree.setSender(this.myAgent.getAID());
 					msgDemandSubTree.setProtocol("UselessProtocol");
 					msgDemandSubTree.setContent(demandSubTree);
 					msgDemandSubTree.addReceiver(msg.getSender());
 					((AbstractDedaleAgent)this.myAgent).sendMessage(msgDemandSubTree);
 				}
-				else {
-					Integer indexPatrolling = Integer.parseInt(msgContent);
-//					this.updateCenterNeighbours();
-//					System.out.println("BRANCH TO PATROLL: " + indexPatrolling);
-//					System.out.println("SO NODE TO START IS: " + this.centerNeighbours.get(indexPatrolling));
-					((HunterAgent)this.myAgent).setIndexPatrolling(indexPatrolling);
+				else if (isContentList) {
+					List<Integer> indicesPatrolling = contentList;
+					((HunterAgent)this.myAgent).setIndicesPatrolling(indicesPatrolling);
 					((HunterAgent)this.myAgent).setRole(AgentRole.patrolling);
 				}
 			} catch (Exception e) {

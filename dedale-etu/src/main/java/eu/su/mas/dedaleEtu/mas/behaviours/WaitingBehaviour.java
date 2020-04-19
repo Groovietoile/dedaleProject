@@ -1,5 +1,7 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class WaitingBehaviour extends SimpleBehaviour {
 	private boolean finished;
 	private String center;
 	private List<String> centerNeighbours;
-	private Integer indexNext;
+	private Integer indexStartNext;
 	public static final String iAmWaiting = "J'attends déjà !";
 
 	public WaitingBehaviour(AbstractDedaleAgent myAgent) {
@@ -30,7 +32,7 @@ public class WaitingBehaviour extends SimpleBehaviour {
 		this.finished = false;
 		this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
 		this.centerNeighbours = null;
-		this.indexNext = 0;
+		this.indexStartNext = 0;
 	}
 
 	@Override
@@ -47,23 +49,40 @@ public class WaitingBehaviour extends SimpleBehaviour {
 			this.updateCenterNeighbours();
 		
 		// On envoie un message vers l'agent
-		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		final ACLMessage msgDemandSubTree = this.myAgent.receive(msgTemplate);
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setSender(this.myAgent.getAID());
 		msg.setProtocol("UselessProtocol");
 		
-		if (msgDemandSubTree == null) {
-			for (String receiver : ((HunterAgent)this.myAgent).getListeAmis())
-				msg.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-			msg.setContent(iAmWaiting);
+		if (msgDemandSubTree != null) {
+			msg.addReceiver(msgDemandSubTree.getSender());
+			List<Integer> indicesNext = new ArrayList<Integer>();
+			Integer count = 0;
+			for (Integer i = this.indexStartNext; count < 1;) {
+				indicesNext.add(i);
+				i = (i + 1) % this.centerNeighbours.size();
+				if (i.intValue() == this.indexStartNext.intValue()) {
+					count++;
+				}
+			}
+			try {
+				msg.setContentObject((Serializable)indicesNext);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+			this.indexStartNext = (this.indexStartNext + 1) % this.centerNeighbours.size();
 		}
 		else {
-			msg.addReceiver(msgDemandSubTree.getSender());
-			msg.setContent(this.indexNext.toString());
+			for (String receiver : ((HunterAgent)this.myAgent).getListeAmis())
+				msg.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+			try {
+				msg.setContentObject((Serializable)iAmWaiting);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-			this.indexNext = (this.indexNext + 1) % this.centerNeighbours.size();
 		}
 	}
 

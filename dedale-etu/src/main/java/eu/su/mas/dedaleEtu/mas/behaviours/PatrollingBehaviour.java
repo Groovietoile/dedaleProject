@@ -5,6 +5,7 @@ import java.util.List;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -18,12 +19,16 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 	private boolean finished;
 	private String center;
 	private List<String> centerNeighbours;
+	private MapMessage mapToPatroll;
+	private boolean recopyMap;
 	
 	public PatrollingBehaviour(AbstractDedaleAgent myAgent) {
 		super(myAgent);
 		this.finished = false;
-		this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
+		this.center = null;
 		this.centerNeighbours = null;
+		this.mapToPatroll = null;
+		this.recopyMap = true;
 	}
 
 	@Override
@@ -37,10 +42,27 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 			else 
 				e.printStackTrace();
 		}
-		Integer indexPatrolling = ((HunterAgent)this.myAgent).getIndexPatrolling();
-		this.updateCenterNeighbours();
-		System.out.println("BRANCH TO PATROLL: " + indexPatrolling);
-		System.out.println("SO NODE TO START IS: " + this.centerNeighbours.get(indexPatrolling));
+		if (this.center == null) {
+			this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
+			this.updateCenterNeighbours();
+		}
+		if (this.mapToPatroll == null) {
+			this.mapToPatroll = new MapMessage();
+			this.mapToPatroll.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap());
+		}
+		if (recopyMap) {
+			while (this.mapToPatroll.getListeDesNoeuds().get("closed").size() != 0) {
+				String idNode = this.mapToPatroll.getListeDesNoeuds().get("closed").get(0);
+				this.mapToPatroll.getListeDesNoeuds().get("closed").remove(0);
+				this.mapToPatroll.getListeDesNoeuds().get("open").add(idNode);
+			}
+			recopyMap = false;
+		}
+		List<Integer> indicesPatrolling = ((HunterAgent)this.myAgent).getIndicesPatrolling();
+		System.out.println("CLOSED");
+		System.out.println(this.mapToPatroll.getListeDesNoeuds().get("closed"));
+		System.out.println("OPEN");
+		System.out.println(this.mapToPatroll.getListeDesNoeuds().get("open"));
 	}
 
 	public String getCenter() {
@@ -55,6 +77,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 		if (this.centerNeighbours == null)
 			this.centerNeighbours = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getNodeNeighbours(this.center);
 	}
+	
 
 	@Override
 	public boolean done() {

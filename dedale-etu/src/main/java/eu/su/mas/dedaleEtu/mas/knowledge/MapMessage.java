@@ -160,11 +160,10 @@ public class MapMessage implements Serializable {
 		return neighbours;
 	}
 	
+	
 	public class StringCustomComparator implements Comparator<String> {
 		
-		public StringCustomComparator() {
-			
-		}
+		public StringCustomComparator() {}
 
 		@Override
 		public int compare(String o1, String o2) {

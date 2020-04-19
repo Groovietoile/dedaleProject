@@ -37,7 +37,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	private List<String> listeAmis;
 	private boolean followingGolem;
 	private AgentRole role;
-	private Integer indexPatrolling;
+	private List<Integer> indicesPatrolling;
 	
 	public AgentRole getRole() {
 		return role;
@@ -55,7 +55,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		this.myMapMessage = new MapMessage();
 		this.followingGolem = false;
 		this.role = AgentRole.exploring;
-		this.indexPatrolling = -1;
+		this.indicesPatrolling = new ArrayList<Integer>();
 		
 		/************************************************
 		 * 
@@ -124,12 +124,12 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		return this.role == AgentRole.patrolling;
 	}
 
-	public Integer getIndexPatrolling() {
-		return indexPatrolling;
+	public List<Integer> getIndicesPatrolling() {
+		return indicesPatrolling;
 	}
 
-	public void setIndexPatrolling(Integer indexPatrolling) {
-		this.indexPatrolling = indexPatrolling;
+	public void setIndicesPatrolling(List<Integer> indexPatrolling) {
+		this.indicesPatrolling = indexPatrolling;
 	}
 
 //	public void setFollowingGolem(boolean followingGolem) {
