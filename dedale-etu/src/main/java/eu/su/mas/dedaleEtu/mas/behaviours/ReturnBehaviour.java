@@ -30,9 +30,8 @@ public class ReturnBehaviour extends SimpleBehaviour {
 	public ReturnBehaviour(final AbstractDedaleAgent myAgent) {
 		super(myAgent);
 		this.finished = false;
-		this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
+		this.center = null;
 		this.path = null;
-		this.centerNeighbours = null;
 	}
 
 	@Override
@@ -44,6 +43,10 @@ public class ReturnBehaviour extends SimpleBehaviour {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException"))
 				System.out.println(e.getMessage());
 		}
+
+		if (this.center == null)
+			this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
+
 		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		final ACLMessage msg = this.myAgent.receive(msgTemplate);
 		if (msg != null) {
@@ -79,16 +82,20 @@ public class ReturnBehaviour extends SimpleBehaviour {
 			((HunterAgent)this.myAgent).setRole(AgentRole.waiting);
 			return;
 		}
-		if (this.path == null)
+		if (this.path == null) {
 			this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(currentPosition, this.center);
+			((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
+		}
 		if (this.path.size() > 0) {
 			try {
 				this.myAgent.doWait(500);
 				((AbstractDedaleAgent)this.myAgent).moveTo(this.path.get(0));
 				this.path.remove(0);
+				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
 			}
 			catch (Exception e) {
 				this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(currentPosition, this.center);
+				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
 				System.out.println(currentPosition);
 				System.out.println(path);
 				e.printStackTrace();
@@ -97,10 +104,6 @@ public class ReturnBehaviour extends SimpleBehaviour {
 		
 	}
 	
-	public void updateCenterNeighbours() {
-		if (this.centerNeighbours == null)
-			this.centerNeighbours = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getNodeNeighbours(this.center);
-	}
 
 	@Override
 	public boolean done() {

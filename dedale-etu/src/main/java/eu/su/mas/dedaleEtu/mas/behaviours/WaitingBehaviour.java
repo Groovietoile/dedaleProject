@@ -30,7 +30,7 @@ public class WaitingBehaviour extends SimpleBehaviour {
 	public WaitingBehaviour(AbstractDedaleAgent myAgent) {
 		super(myAgent);
 		this.finished = false;
-		this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
+		this.center = null;
 		this.centerNeighbours = null;
 		this.indexStartNext = 0;
 	}
@@ -45,18 +45,20 @@ public class WaitingBehaviour extends SimpleBehaviour {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException"))
 				System.out.println(e.getMessage());
 		}
+		if (this.center == null)
+			this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
 		if (this.centerNeighbours == null)
 			this.updateCenterNeighbours();
 		
 		// On envoie un message vers l'agent
 		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-		final ACLMessage msgDemandSubTree = this.myAgent.receive(msgTemplate);
+		final ACLMessage msgRequest = this.myAgent.receive(msgTemplate);
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setSender(this.myAgent.getAID());
 		msg.setProtocol("UselessProtocol");
 		
-		if (msgDemandSubTree != null) {
-			msg.addReceiver(msgDemandSubTree.getSender());
+		if (msgRequest != null && msgRequest.getContent().equals(ReturnBehaviour.demandSubTree)) {
+			msg.addReceiver(msgRequest.getSender());
 			List<Integer> indicesNext = new ArrayList<Integer>();
 			Integer count = 0;
 			for (Integer i = this.indexStartNext; count < 1;) {
@@ -73,6 +75,26 @@ public class WaitingBehaviour extends SimpleBehaviour {
 			}
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 			this.indexStartNext = (this.indexStartNext + 1) % this.centerNeighbours.size();
+		}
+		else if (msgRequest != null && msgRequest.getContent().contains(PatrollingBehaviour.giveMeWay)) {
+			String msgRequestContent = msgRequest.getContent();
+			String senderCurrentNode =  msgRequestContent.split(PatrollingBehaviour.delim)[1],
+				   senderNextNode = msgRequestContent.split(PatrollingBehaviour.delim)[2],
+				   senderNodeToStart = msgRequestContent.split(PatrollingBehaviour.delim)[3];
+			String currentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+			List<String> currentNeighbours = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getNodeNeighbours(currentNode);
+			String nodeToMove = null;
+			for (String neighbour : currentNeighbours)
+				if (!neighbour.equals(senderCurrentNode) && !neighbour.equals(senderNextNode) && !neighbour.equals(senderNodeToStart))
+					nodeToMove = neighbour;
+			if (nodeToMove == null)
+				for (String neighbour : currentNeighbours)
+					if (!neighbour.equals(senderCurrentNode) && !neighbour.equals(senderNextNode))
+						nodeToMove = neighbour;
+			this.myAgent.doWait(500);
+			((AbstractDedaleAgent)this.myAgent).moveTo(nodeToMove);
+			// System.out.println("Je constate : senderNextNode = " + senderNextNode + " ; senderNodeToStart = " + senderNodeToStart);
+			
 		}
 		else {
 			for (String receiver : ((HunterAgent)this.myAgent).getListeAmis())

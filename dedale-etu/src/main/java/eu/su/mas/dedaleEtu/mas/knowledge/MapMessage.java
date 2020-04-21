@@ -145,7 +145,7 @@ public class MapMessage implements Serializable {
 	}
 	
 	public String getCenter() {
-		return "5";
+		return "0";
 	}
 	
 	public List<String> getNodeNeighbours(String idNode) {
