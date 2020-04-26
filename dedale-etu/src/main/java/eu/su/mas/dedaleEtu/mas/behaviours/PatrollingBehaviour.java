@@ -65,14 +65,25 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 				this.mapToPatroll.getListeDesNoeuds().get("closed").remove(0);
 				this.mapToPatroll.getListeDesNoeuds().get("open").add(idNode);
 			}
+			if (this.mapToPatroll.getListeDesNoeuds().get("open").contains(this.center))
+				this.mapToPatroll.getListeDesNoeuds().get("open").remove(this.center);
+			if (!this.mapToPatroll.getListeDesNoeuds().get("closed").contains(this.center))
+				this.mapToPatroll.getListeDesNoeuds().get("closed").add(this.center);
 			recopyMap = false;
 		}
 		List<Integer> indicesPatrolling = ((HunterAgent)this.myAgent).getIndicesPatrolling();
 		if (this.nodeToStart == null) {
 			System.out.println(indicesPatrolling);
 			System.out.println(this.centerNeighbours);
-			this.nodeToStart = this.centerNeighbours.get(indicesPatrolling.get(0));
-			((HunterAgent)this.myAgent).getIndicesPatrolling().remove(0);
+			try {
+				// le cas où on a encore une sous-partie à patrouiller
+				this.nodeToStart = this.centerNeighbours.get(indicesPatrolling.get(0));
+				((HunterAgent)this.myAgent).getIndicesPatrolling().remove(0);
+			} catch (Exception e) {
+				// le cas où on a déjà patrouillé toutes les sous-parties demandées
+				e.printStackTrace();
+				((HunterAgent)this.myAgent).setRole(HunterAgent.AgentRole.returning);
+			}
 		}
 		if (!this.startReached) {
 			// On traite le cas dans lequel on ne se situe pas encore dans un noeud de départ
@@ -105,7 +116,46 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 			}
 		}
 		else {
-			finished = true;
+			// On traite le cas où on a déjà atteint un point de départ et où on patrouille une sous-partie actuelle
+			String currentPosition = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+			if (this.mapToPatroll.getListeDesNoeuds().get("open").contains(currentPosition))
+				this.mapToPatroll.getListeDesNoeuds().get("open").remove((Object)currentPosition);
+			if (!this.mapToPatroll.getListeDesNoeuds().get("closed").contains(currentPosition))
+				this.mapToPatroll.getListeDesNoeuds().get("closed").add(currentPosition);
+			// System.out.println(this.mapToPatroll.getListeDesNoeuds().get("open"));
+			// System.out.println(this.mapToPatroll.getListeDesNoeuds().get("closed"));
+			
+			List<String> currentNeighbours = this.mapToPatroll.getNodeNeighbours(currentPosition);
+			this.nextNode = null;
+			for (String neighbour: currentNeighbours) {
+				// On essaie de trouver un voisin ouvert
+				if (this.mapToPatroll.getListeDesNoeuds().get("open").contains(neighbour)) {
+					this.nextNode = neighbour;
+				}
+			}
+			if (this.nextNode == null) {
+				// Si on n'a pas réussi à trouver un voisin ouvert on prend pour notre noeud suivant un sommet le plus proche parmi ceux ouverts
+				Integer shortestPathLength = Integer.MAX_VALUE;
+				for (String node: this.mapToPatroll.getListeDesNoeuds().get("open")) {
+					List<String> path = this.mapToPatroll.getShortestPath(currentPosition, node);
+					if (path.size() < shortestPathLength) {
+						shortestPathLength = path.size();
+						nextNode = path.get(0);
+					}
+				}
+			}
+			if (this.nextNode != null) {
+				// On n'a pas encore fermé tous les noeuds alors on bouge vers un noeud ouvert suivant
+				((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
+				this.myAgent.doWait(500);
+				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
+			}
+			else {
+				// On a déjà fermé tous les noeuds ouverts et on recommence par une autre sous-partie
+				this.nodeToStart = null;
+				this.startReached = false;
+				this.recopyMap = true;
+			}
 		}
 		
 	}

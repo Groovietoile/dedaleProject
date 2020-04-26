@@ -123,17 +123,28 @@ public class MapMessage implements Serializable {
 		List<String> shortestPath=new ArrayList<String>();
 
 		Dijkstra dijkstra = new Dijkstra();//number of edge
-
+		
+		boolean addNode = true;
 		Graph g = new SingleGraph("graph_temp");
-		for (ArrayList<String> nodes : this.listeDesNoeuds.values())
-			for (String n : nodes)
-				g.addNode(n);
+		for (ArrayList<String> nodes : this.listeDesNoeuds.values()) {
+			for (String n : nodes) {
+				addNode = true;
+				for (Object ng : g.nodes().toArray()) {
+					if (((Node)ng).getId().equals(n)) {
+						addNode = false;
+						break;
+					}
+				}
+				if (addNode)
+					g.addNode(n);
+			}
+		}
 		for (Couple<String, String> edge : this.listeDesArcs)
 			g.addEdge("(" + edge.getLeft() + ", " + edge.getRight() + ")", edge.getLeft(), edge.getRight());
 
 		dijkstra.init(g);
 		dijkstra.setSource(g.getNode(idFrom));
-		dijkstra.compute();//compute the distance to all nodes from idFrom
+		dijkstra.compute();  // compute the distance to all nodes from idFrom
 		List<Node> path=dijkstra.getPath(g.getNode(idTo)).getNodePath(); //the shortest path from idFrom to idTo
 		Iterator<Node> iter=path.iterator();
 		while (iter.hasNext()){
@@ -145,7 +156,7 @@ public class MapMessage implements Serializable {
 	}
 	
 	public String getCenter() {
-		return "0";
+		return "5";
 	}
 	
 	public List<String> getNodeNeighbours(String idNode) {
