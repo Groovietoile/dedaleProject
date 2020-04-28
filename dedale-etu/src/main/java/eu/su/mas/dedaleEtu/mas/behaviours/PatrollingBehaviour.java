@@ -94,7 +94,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 				// Si on est déjà dans un point de départ alors on a atteint évidemment ce point de départ
 				this.startReached = true;
 				this.nextNode = null;
-				((AbstractExploreMultiAgent)this.myAgent).setNextNode(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+				// ((AbstractExploreMultiAgent)this.myAgent).setNextNode(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 			}
 			else {
 				// Sinon on doit trouver un chemin vers le point de départ et aller au premier point de ce chemin
@@ -117,15 +117,15 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 		}
 		else {
 			// On traite le cas où on a déjà atteint un point de départ et où on patrouille une sous-partie actuelle
-			String currentPosition = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-			if (this.mapToPatroll.getListeDesNoeuds().get("open").contains(currentPosition))
-				this.mapToPatroll.getListeDesNoeuds().get("open").remove((Object)currentPosition);
-			if (!this.mapToPatroll.getListeDesNoeuds().get("closed").contains(currentPosition))
-				this.mapToPatroll.getListeDesNoeuds().get("closed").add(currentPosition);
-			// System.out.println(this.mapToPatroll.getListeDesNoeuds().get("open"));
+			((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+			if (this.mapToPatroll.getListeDesNoeuds().get("open").contains(((AbstractDedaleAgent)this.myAgent).getCurrentPosition()))
+				this.mapToPatroll.getListeDesNoeuds().get("open").remove((Object)((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+			if (!this.mapToPatroll.getListeDesNoeuds().get("closed").contains(((AbstractDedaleAgent)this.myAgent).getCurrentPosition()))
+				this.mapToPatroll.getListeDesNoeuds().get("closed").add(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+			System.out.println(this.mapToPatroll.getListeDesNoeuds().get("open"));
 			// System.out.println(this.mapToPatroll.getListeDesNoeuds().get("closed"));
 			
-			List<String> currentNeighbours = this.mapToPatroll.getNodeNeighbours(currentPosition);
+			List<String> currentNeighbours = this.mapToPatroll.getNodeNeighbours(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 			this.nextNode = null;
 			for (String neighbour: currentNeighbours) {
 				// On essaie de trouver un voisin ouvert
@@ -137,7 +137,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 				// Si on n'a pas réussi à trouver un voisin ouvert on prend pour notre noeud suivant un sommet le plus proche parmi ceux ouverts
 				Integer shortestPathLength = Integer.MAX_VALUE;
 				for (String node: this.mapToPatroll.getListeDesNoeuds().get("open")) {
-					List<String> path = this.mapToPatroll.getShortestPath(currentPosition, node);
+					List<String> path = this.mapToPatroll.getShortestPath(((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), node);
 					if (path.size() < shortestPathLength) {
 						shortestPathLength = path.size();
 						nextNode = path.get(0);

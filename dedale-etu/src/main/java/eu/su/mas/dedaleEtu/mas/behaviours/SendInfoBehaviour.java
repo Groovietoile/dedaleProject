@@ -41,7 +41,7 @@ public class SendInfoBehaviour extends TickerBehaviour {
 	public void onTick() {
 		
 		try {
-			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) {
+			if (((HunterAgent)this.myAgent).isBlocking()) {
 				this.stop();
 				return;
 			}
@@ -57,7 +57,7 @@ public class SendInfoBehaviour extends TickerBehaviour {
 		MapMessage mapMsg = ((AbstractExploreMultiAgent)this.myAgent).getMyMap();
 		
 		//A message is defined by : a performative, a sender, a set of receivers, (a protocol),(a content (and/or contentOBject))
-		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
+		ACLMessage msg=new ACLMessage(ACLMessage.INFORM_REF);
 		msg.setSender(this.myAgent.getAID());
 		msg.setProtocol("UselessProtocol");
 		
@@ -68,8 +68,14 @@ public class SendInfoBehaviour extends TickerBehaviour {
 		if (myPosition!="") {
 			
 //			myMap.prepareMigration();
-			ExploMultiAgentMessageContent msgContent = new ExploMultiAgentMessageContent(myAgent.getLocalName(), myPosition, myNextNode, mapMsg, false);
-			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to reach its friends");
+			ExploMultiAgentMessageContent msgContent = null;
+			try {
+				msgContent = new ExploMultiAgentMessageContent(myAgent.getLocalName(), myPosition, myNextNode, mapMsg, false, ((HunterAgent)this.myAgent).getRole());
+			}
+			catch (Exception e) {
+				msgContent = new ExploMultiAgentMessageContent(myAgent.getLocalName(), myPosition, myNextNode, mapMsg, false);
+			}
+			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to  reach its friends");
 			try {
 				msg.setContentObject(msgContent);
 			} catch (IOException e) {
@@ -84,6 +90,11 @@ public class SendInfoBehaviour extends TickerBehaviour {
 			//Mandatory to use this method (it takes into account the environment to decide if someone is reachable or not)
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 			// System.out.println("Current : " + myPosition + " Next : " + myNextNode);
+			
+//			try {
+//				System.out.println("AGENT : " + this.myAgent.getLocalName() + " ROLE : " + ((HunterAgent)this.myAgent).getRole().toString());
+//			}
+//			catch (Exception e) {}
 		}
 	}
 	

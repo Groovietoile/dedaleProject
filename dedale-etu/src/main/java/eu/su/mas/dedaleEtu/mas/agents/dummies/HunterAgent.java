@@ -1,8 +1,10 @@
 package eu.su.mas.dedaleEtu.mas.agents.dummies;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
@@ -18,6 +20,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.SendInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.TestOdeurBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.WaitingBehaviour;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
+import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 
 public class HunterAgent extends AbstractExploreMultiAgent {
@@ -26,14 +29,69 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	 * 
 	 */
 	public static enum AgentRole {
-		exploring,
-		following,
 		blocking,
+		following,
+		patrolling,
 		waiting,
 		returning,
-		patrolling;
+		exploring
+	}
+	// exploring <= returning <= waiting <= patrolling <= following <= blocking
+	// AgentRole left, right;
+	// left <= right ?
+	//
+	private static HashMap<Couple<AgentRole, AgentRole>, Integer> agentsRolesRelNEq = null;
+	private static void initARR() {
+		HunterAgent.agentsRolesRelNEq = new HashMap<Couple<AgentRole, AgentRole>, Integer>();
+
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.following), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.patrolling), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.waiting), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.returning), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.exploring), -1);
+		
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.patrolling), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.waiting), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.returning), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.exploring), -1);
+		
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.following), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.waiting), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.returning), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.exploring), -1);
+		
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.following), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.patrolling), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.returning), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.exploring), -1);
+		
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.following), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.patrolling), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.waiting), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.exploring), -1);
+		
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.following), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.patrolling), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.waiting), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.returning), 1);
+	}
+	// left == right -> 0
+	// left > right  -> -1
+	// left < right  -> 1
+	public static Integer AgentsRolesPriority(AgentRole left, AgentRole right) {
+		if (left == right)
+			return 0;
+		if (HunterAgent.agentsRolesRelNEq == null)
+			HunterAgent.initARR();
+		return HunterAgent.agentsRolesRelNEq.get(new Couple<AgentRole, AgentRole>(left, right));
 	}
 	private static final long serialVersionUID = 5053345286495358254L;
+
 	private List<String> listeAmis;
 	private boolean followingGolem;
 	private AgentRole role;
@@ -50,7 +108,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	protected void setup() {
 
 		super.setup();
-		
+
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 		this.myMapMessage = new MapMessage();
 		this.followingGolem = false;
@@ -104,24 +162,28 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		this.myMapMessage = myMapMessage;
 	}
 	
-	public boolean isFollowingGolem() {
+	public boolean isBlocking() {
+		return this.role == AgentRole.blocking;
+	}
+	
+	public boolean isFollowing() {
 		return this.role == AgentRole.following;
 	}
 	
-	public boolean isExploring() {
-		return this.role == AgentRole.exploring;
-	}
-	
-	public boolean isReturning() {
-		return this.role == AgentRole.returning;
+	public boolean isPatrolling() {
+		return this.role == AgentRole.patrolling;
 	}
 	
 	public boolean isWaiting() {
 		return this.role == AgentRole.waiting;
 	}
 	
-	public boolean isPatrolling() {
-		return this.role == AgentRole.patrolling;
+	public boolean isReturning() {
+		return this.role == AgentRole.returning;
+	}
+
+	public boolean isExploring() {
+		return this.role == AgentRole.exploring;
 	}
 
 	public List<Integer> getIndicesPatrolling() {

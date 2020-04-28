@@ -78,23 +78,35 @@ public class ReturnBehaviour extends SimpleBehaviour {
 		}
 		String currentPosition = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		if (currentPosition.equals(this.center)) {
-			finished = true;
 			((HunterAgent)this.myAgent).setRole(AgentRole.waiting);
+			((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.center);
+			path = null;
 			return;
 		}
+		else if (this.path != null && this.path.size() == 0) {
+			this.path = null;
+		}
+		
 		if (this.path == null) {
 			this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(currentPosition, this.center);
 			((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
+//			System.out.println("AGENT QUI RETOURNE : " + this.myAgent.getLocalName());
+//			System.out.println("POS CUR : " + currentPosition);
+//			System.out.println("CENTRE OU JE VAIS : " + this.center);
+//			System.out.println("JE SAIS UN CHEMIN : " + (path == null));
+//			System.out.println("C'EST : " + path);
 		}
+		
+
 		if (this.path.size() > 0) {
 			try {
-				this.myAgent.doWait(500);
 				((AbstractDedaleAgent)this.myAgent).moveTo(this.path.get(0));
+				this.myAgent.doWait(500);
 				this.path.remove(0);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
 			}
 			catch (Exception e) {
-				this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(currentPosition, this.center);
+				this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), this.center);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
 				System.out.println(currentPosition);
 				System.out.println(path);

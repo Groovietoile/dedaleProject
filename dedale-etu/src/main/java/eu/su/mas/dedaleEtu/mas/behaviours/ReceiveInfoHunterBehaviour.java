@@ -8,6 +8,7 @@ import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent.AgentRole;
 import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
 import jade.core.Agent;
@@ -33,7 +34,7 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 	public void action() {
 		
 		try {
-			if (!((HunterAgent)this.myAgent).isExploring() && !((HunterAgent)this.myAgent).isReturning()) {
+			if (((HunterAgent)this.myAgent).isBlocking() || ((HunterAgent)this.myAgent).isFollowing()) {
 				this.finished = true;
 				return;
 			}
@@ -44,7 +45,7 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 			}
 		}
 		
-		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM_REF);
 		final String giveMeWayString = "Laisse-moi passer stp !";
 
 		final ACLMessage msg = this.myAgent.receive(msgTemplate);
@@ -62,25 +63,40 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 		MapMessage senderMapMessage = msgContent.getMap();
 		((AbstractExploreMultiAgent)this.myAgent).mergeMap(senderMapMessage);
 		boolean noNeighbours = false;
-		if (!msgContent.isGiveMeWay()) {
+		AgentRole myRole = ((HunterAgent)this.myAgent).getRole(), senderRole = msgContent.getRole();
+		if (myRole == AgentRole.waiting) {
+			System.out.println("INFO DE SENDER :");
+			System.out.println(msgContent.getAgentName());
+			System.out.println(msgContent.getCurrentPosition());
+			System.out.println(msgContent.getNextPosition());
+			System.out.println(msgContent.getRole());
+			
+			System.out.println("INFO DE MOI :");
+			System.out.println(this.myAgent.getLocalName());
+			System.out.println(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getNextNode());
+			System.out.println(myRole);
+			
+		}
+		if (!msgContent.isGiveMeWay() && HunterAgent.AgentsRolesPriority(myRole, senderRole) >= 0) {
 			String senderCurrentNode = msgContent.getCurrentPosition(), senderNextNode = msgContent.getNextPosition(),
 				   myCurrentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition(),
 				   myNextNode = ((AbstractExploreMultiAgent)this.myAgent).getNextNode();
 			// System.out.println(senderCurrentNode + ',' + myNextNode + ',' + senderNextNode + ',' + myCurrentNode);
 			// System.out.println(senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode));
-			if (senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode) && !myCurrentNode.equals(myNextNode)) {
+			if ((senderCurrentNode.equals(myNextNode) || myNextNode.equals(myCurrentNode)) && senderNextNode.equals(myCurrentNode)) {
 				noNeighbours = !this.giveWay(myCurrentNode, senderCurrentNode);
 			}
-			if ((senderCurrentNode.equals(senderNextNode) && senderCurrentNode.equals(myNextNode) && !myCurrentNode.equals(myNextNode)) || noNeighbours) {
+			if (noNeighbours) {
 				System.out.println("Agent " + this.myAgent.getLocalName() + " : " + giveMeWayString);
-				ACLMessage msgGiveMeWay = new ACLMessage(ACLMessage.INFORM);
+				ACLMessage msgGiveMeWay = new ACLMessage(ACLMessage.INFORM_REF);
 				msgGiveMeWay.setSender(this.myAgent.getAID());
 				msgGiveMeWay.setProtocol("UselessProtocol");
 
 				MapMessage myMap = ((AbstractExploreMultiAgent)this.myAgent).getMyMap();
 				try {
 					msgGiveMeWay.setContentObject(
-							new ExploMultiAgentMessageContent(myAgent.getLocalName(), myCurrentNode, myNextNode, myMap, true));
+							new ExploMultiAgentMessageContent(myAgent.getLocalName(), myCurrentNode, myNextNode, myMap, true, ((HunterAgent)this.myAgent).getRole()));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

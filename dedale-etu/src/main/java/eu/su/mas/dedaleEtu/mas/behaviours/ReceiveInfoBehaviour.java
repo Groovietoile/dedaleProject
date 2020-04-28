@@ -27,7 +27,7 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 
 	@Override
 	public void onTick() {
-		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM_REF);
 		final String giveMeWayString = "Laisse-moi passer stp !";
 
 		final ACLMessage msg = this.myAgent.receive(msgTemplate);
@@ -114,7 +114,7 @@ public class ReceiveInfoBehaviour extends TickerBehaviour {
 			}
 			if (senderCurrentNode.equals(senderNextNode) && senderCurrentNode.equals(myNextNode) && !myCurrentNode.equals(myNextNode)) {
 				System.out.println("Agent " + this.myAgent.getLocalName() + " : " + giveMeWayString);
-				ACLMessage msgGiveMeWay = new ACLMessage(ACLMessage.INFORM);
+				ACLMessage msgGiveMeWay = new ACLMessage(ACLMessage.INFORM_REF);
 				msgGiveMeWay.setSender(this.myAgent.getAID());
 				msgGiveMeWay.setProtocol("UselessProtocol");
 

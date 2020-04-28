@@ -9,6 +9,7 @@ import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent.AgentRole;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
@@ -50,6 +51,13 @@ public class WaitingBehaviour extends SimpleBehaviour {
 		if (this.centerNeighbours == null)
 			this.updateCenterNeighbours();
 		
+		if (!((AbstractDedaleAgent)this.myAgent).getCurrentPosition().equals(this.center)) {
+			((HunterAgent)this.myAgent).setRole(AgentRole.returning);
+		}
+		else {
+			((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.center);
+		}
+		
 		// On envoie un message vers l'agent
 		final MessageTemplate msgTemplate = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		final ACLMessage msgRequest = this.myAgent.receive(msgTemplate);
@@ -74,25 +82,28 @@ public class WaitingBehaviour extends SimpleBehaviour {
 				e.printStackTrace();
 			}
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+			this.myAgent.doWait(3000);
 			this.indexStartNext = (this.indexStartNext + 1) % this.centerNeighbours.size();
+			
 		}
 		else if (msgRequest != null && msgRequest.getContent().contains(PatrollingBehaviour.giveMeWay)) {
-			String msgRequestContent = msgRequest.getContent();
-			String senderCurrentNode =  msgRequestContent.split(PatrollingBehaviour.delim)[1],
-				   senderNextNode = msgRequestContent.split(PatrollingBehaviour.delim)[2],
-				   senderNodeToStart = msgRequestContent.split(PatrollingBehaviour.delim)[3];
-			String currentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-			List<String> currentNeighbours = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getNodeNeighbours(currentNode);
-			String nodeToMove = null;
-			for (String neighbour : currentNeighbours)
-				if (!neighbour.equals(senderCurrentNode) && !neighbour.equals(senderNextNode) && !neighbour.equals(senderNodeToStart))
-					nodeToMove = neighbour;
-			if (nodeToMove == null)
-				for (String neighbour : currentNeighbours)
-					if (!neighbour.equals(senderCurrentNode) && !neighbour.equals(senderNextNode))
-						nodeToMove = neighbour;
-			this.myAgent.doWait(500);
-			((AbstractDedaleAgent)this.myAgent).moveTo(nodeToMove);
+//			String msgRequestContent = msgRequest.getContent();
+//			String senderCurrentNode =  msgRequestContent.split(PatrollingBehaviour.delim)[1],
+//				   senderNextNode = msgRequestContent.split(PatrollingBehaviour.delim)[2],
+//				   senderNodeToStart = msgRequestContent.split(PatrollingBehaviour.delim)[3];
+//			String currentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+//			List<String> currentNeighbours = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getNodeNeighbours(currentNode);
+//			String nodeToMove = null;
+//			for (String neighbour : currentNeighbours)
+//				if (!neighbour.equals(senderCurrentNode) && !neighbour.equals(senderNextNode) && !neighbour.equals(senderNodeToStart))
+//					nodeToMove = neighbour;
+//			if (nodeToMove == null)
+//				for (String neighbour : currentNeighbours)
+//					if (!neighbour.equals(senderCurrentNode) && !neighbour.equals(senderNextNode))
+//						nodeToMove = neighbour;
+//			this.myAgent.doWait(500);
+//			((AbstractDedaleAgent)this.myAgent).moveTo(nodeToMove);
+//			((HunterAgent)this.myAgent).setRole(AgentRole.returning);
 			// System.out.println("Je constate : senderNextNode = " + senderNextNode + " ; senderNodeToStart = " + senderNodeToStart);
 			
 		}
@@ -105,6 +116,7 @@ public class WaitingBehaviour extends SimpleBehaviour {
 				e.printStackTrace();
 			}
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+			this.myAgent.doWait(3000);
 		}
 	}
 

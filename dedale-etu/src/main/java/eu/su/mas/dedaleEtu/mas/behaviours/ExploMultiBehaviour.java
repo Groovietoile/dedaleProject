@@ -181,6 +181,7 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 				/************************************************
 				 * 				END API CALL ILUSTRATION
 				 *************************************************/
+				// System.out.println("JE BOUGE");
 				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
 //				System.out.println(myMap.toString());
