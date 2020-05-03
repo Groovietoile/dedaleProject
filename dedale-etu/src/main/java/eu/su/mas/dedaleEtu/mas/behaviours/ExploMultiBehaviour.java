@@ -63,9 +63,13 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 			}
 		}
 
-		if(this.myMap==null)
+		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
-		this.myMap.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap());
+			((AbstractExploreMultiAgent)this.myAgent).getMyMap().getListeDesNoeuds().get("open").add(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+		}
+		else {
+			this.myMap.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap());
+		}
 		
 		//0) Retrieve the current position
 		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
@@ -182,10 +186,17 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 				 * 				END API CALL ILUSTRATION
 				 *************************************************/
 				// System.out.println("JE BOUGE");
-				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
-				((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
-//				System.out.println(myMap.toString());
-				((AbstractExploreMultiAgent)this.myAgent).mergeMap(this.myMap);
+				if (((AbstractExploreMultiAgent)this.myAgent).getMyMap().getListeDesNoeuds().get("open").size() > 0) {
+					((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
+					((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
+	//				System.out.println(myMap.toString());
+					((AbstractExploreMultiAgent)this.myAgent).mergeMap(this.myMap);
+				}
+				else {
+					this.myMap.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap());
+					finished = true;
+					((HunterAgent)this.myAgent).setRole(AgentRole.returning);
+				}
 
 			}
 

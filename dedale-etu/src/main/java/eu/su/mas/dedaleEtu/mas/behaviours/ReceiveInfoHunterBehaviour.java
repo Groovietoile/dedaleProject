@@ -106,7 +106,7 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 				((AbstractDedaleAgent)this.myAgent).sendMessage(msgGiveMeWay);
 			}
 		}
-		else {
+		else if (msgContent.isGiveMeWay()) {
 			String senderCurrentNode = msgContent.getCurrentPosition();
 			String myCurrentNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 			boolean done = this.giveWay(myCurrentNode, senderCurrentNode);
@@ -169,6 +169,7 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 		}
 		if (neighbourRandomIndex != -1) {
 			((AbstractDedaleAgent)this.myAgent).moveTo(neighbourRandom);
+			this.myAgent.doWait(500);
 		}
 		else { success = false; }
 		return success;

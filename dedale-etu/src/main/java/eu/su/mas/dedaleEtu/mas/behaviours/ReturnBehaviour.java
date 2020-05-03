@@ -66,18 +66,19 @@ public class ReturnBehaviour extends SimpleBehaviour {
 					msgDemandSubTree.setContent(demandSubTree);
 					msgDemandSubTree.addReceiver(msg.getSender());
 					((AbstractDedaleAgent)this.myAgent).sendMessage(msgDemandSubTree);
+					this.myAgent.doWait(1000);
 				}
 				else if (isContentList) {
 					List<Integer> indicesPatrolling = contentList;
 					((HunterAgent)this.myAgent).setIndicesPatrolling(indicesPatrolling);
 					((HunterAgent)this.myAgent).setRole(AgentRole.patrolling);
+					return;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		String currentPosition = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-		if (currentPosition.equals(this.center)) {
+		if (((AbstractDedaleAgent)this.myAgent).getCurrentPosition().equals(this.center)) {
 			((HunterAgent)this.myAgent).setRole(AgentRole.waiting);
 			((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.center);
 			path = null;
@@ -88,29 +89,24 @@ public class ReturnBehaviour extends SimpleBehaviour {
 		}
 		
 		if (this.path == null) {
-			this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(currentPosition, this.center);
-			((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
-//			System.out.println("AGENT QUI RETOURNE : " + this.myAgent.getLocalName());
-//			System.out.println("POS CUR : " + currentPosition);
-//			System.out.println("CENTRE OU JE VAIS : " + this.center);
-//			System.out.println("JE SAIS UN CHEMIN : " + (path == null));
-//			System.out.println("C'EST : " + path);
+			this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), this.center);
+			((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : ((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 		}
 		
 
 		if (this.path.size() > 0) {
 			try {
-				((AbstractDedaleAgent)this.myAgent).moveTo(this.path.get(0));
 				this.myAgent.doWait(500);
+				((AbstractDedaleAgent)this.myAgent).moveTo(this.path.get(0));
 				this.path.remove(0);
-				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
+				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : ((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 			}
 			catch (Exception e) {
 				this.path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), this.center);
-				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : currentPosition);
-				System.out.println(currentPosition);
+				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : ((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+				System.out.println(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 				System.out.println(path);
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 		

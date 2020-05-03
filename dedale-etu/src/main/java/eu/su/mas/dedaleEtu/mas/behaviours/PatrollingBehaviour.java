@@ -75,14 +75,16 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 		if (this.nodeToStart == null) {
 			System.out.println(indicesPatrolling);
 			System.out.println(this.centerNeighbours);
-			try {
+			if (indicesPatrolling.size() > 0) {
 				// le cas où on a encore une sous-partie à patrouiller
 				this.nodeToStart = this.centerNeighbours.get(indicesPatrolling.get(0));
 				((HunterAgent)this.myAgent).getIndicesPatrolling().remove(0);
-			} catch (Exception e) {
+			}
+		    else {
 				// le cas où on a déjà patrouillé toutes les sous-parties demandées
-				e.printStackTrace();
 				((HunterAgent)this.myAgent).setRole(HunterAgent.AgentRole.returning);
+				System.out.println("OK J'AI FINI MON TACHE ET JE ME RETOURNE");
+				return;
 			}
 		}
 		if (!this.startReached) {
@@ -90,6 +92,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 //			System.out.println(this.myAgent.getLocalName());
 //			System.out.println("Ma position actuelle est " + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition() +
 //					" mon point de départ est "  + this.nodeToStart);
+//			System.out.println("CAS 1");
 			if (this.nodeToStart.equals(((AbstractDedaleAgent)this.myAgent).getCurrentPosition())) {
 				// Si on est déjà dans un point de départ alors on a atteint évidemment ce point de départ
 				this.startReached = true;
@@ -98,19 +101,17 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 			}
 			else {
 				// Sinon on doit trouver un chemin vers le point de départ et aller au premier point de ce chemin
+//				List<String> path = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), this.nodeToStart);
+//				this.nextNode = path.get(0);
+//				System.out.println("CURRENT POSITION : " + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+//				System.out.println("TARGET : " + this.nodeToStart);
+//				System.out.println("FULL PATH : " + path);
+//				System.out.println("SO NEXT NODE IS : " + this.nextNode);
 				this.nextNode = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(
 						((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), this.nodeToStart).get(0);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.nextNode);
 				// System.out.println("Je voudrais accéder alors vers un noeud " + this.nextNode);
-				
-				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-				msg.setSender(this.myAgent.getAID());
-				msg.setProtocol("UselessProtocol");
-				msg.setContent(giveMeWay + delim + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition() +
- 						delim + this.nextNode + delim + this.nodeToStart);
-				for (String receiver : ((HunterAgent)this.myAgent).getListeAmis())
-					msg.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+
 				this.myAgent.doWait(500);
 				((AbstractExploreMultiAgent)this.myAgent).moveTo(this.nextNode);
 			}
@@ -122,9 +123,8 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 				this.mapToPatroll.getListeDesNoeuds().get("open").remove((Object)((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 			if (!this.mapToPatroll.getListeDesNoeuds().get("closed").contains(((AbstractDedaleAgent)this.myAgent).getCurrentPosition()))
 				this.mapToPatroll.getListeDesNoeuds().get("closed").add(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
-			System.out.println(this.mapToPatroll.getListeDesNoeuds().get("open"));
+			// System.out.println(this.mapToPatroll.getListeDesNoeuds().get("open"));
 			// System.out.println(this.mapToPatroll.getListeDesNoeuds().get("closed"));
-			
 			List<String> currentNeighbours = this.mapToPatroll.getNodeNeighbours(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 			this.nextNode = null;
 			for (String neighbour: currentNeighbours) {
@@ -133,6 +133,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 					this.nextNode = neighbour;
 				}
 			}
+			List<String> pathMin = null;
 			if (this.nextNode == null) {
 				// Si on n'a pas réussi à trouver un voisin ouvert on prend pour notre noeud suivant un sommet le plus proche parmi ceux ouverts
 				Integer shortestPathLength = Integer.MAX_VALUE;
@@ -140,12 +141,17 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 					List<String> path = this.mapToPatroll.getShortestPath(((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), node);
 					if (path.size() < shortestPathLength) {
 						shortestPathLength = path.size();
+						pathMin = path;
 						nextNode = path.get(0);
 					}
 				}
 			}
 			if (this.nextNode != null) {
 				// On n'a pas encore fermé tous les noeuds alors on bouge vers un noeud ouvert suivant
+//				System.out.println("CURRENT POSITION : " + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+//				System.out.println("TARGET : " + this.nodeToStart);
+//				System.out.println("FULL PATH : " + pathMin);
+//				System.out.println("SO NEXT NODE IS : " + this.nextNode);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
 				this.myAgent.doWait(500);
 				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
