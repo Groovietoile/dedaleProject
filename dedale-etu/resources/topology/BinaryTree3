@@ -34,6 +34,11 @@ an 30	label: 30
 an 31	label: 31
 an 32	label: 32
 an 33	label: 33
+an 34 	label: 34
+an 35   label: 35
+an 36   label: 36
+an 37   label: 37
+an 38   label: 38
 
 ae e2	0 1
 ae e3	0 2
@@ -68,3 +73,10 @@ ae e31	20 30
 ae e32	20 31
 ae e33 	21 32
 ae e34	21 33
+ae e35  31 34
+ae e36  34 35
+ae e37  35 36
+ae e38  36 37
+ae e39  37 38
+ae e40  38 30
+ae e41  20 21
