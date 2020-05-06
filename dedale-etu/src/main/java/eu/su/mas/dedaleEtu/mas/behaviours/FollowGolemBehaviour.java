@@ -26,6 +26,8 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub
+		if (((HunterAgent)this.myAgent).isBlocking())
+			return;
 		boolean stenchExistance = false;
 		String posToMove = "";
 		List<Couple<String, List<Couple<Observation, Integer>>>> obsRes = ((AbstractDedaleAgent)this.myAgent).observe();
@@ -46,6 +48,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 //			System.out.println(posToMove);
 			((HunterAgent)this.myAgent).setRole(AgentRole.following);
 			((AbstractDedaleAgent) this.myAgent).moveTo(posToMove);
+			((HunterAgent)this.myAgent).setMeasureTime(true);
 		}
 		else {
 			((HunterAgent) this.myAgent).setRole(roleBefore);

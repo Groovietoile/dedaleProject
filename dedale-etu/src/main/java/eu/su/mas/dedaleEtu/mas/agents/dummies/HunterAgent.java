@@ -7,6 +7,7 @@ import java.util.List;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
+import eu.su.mas.dedaleEtu.mas.behaviours.CheckBlockBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.FollowGolemBehaviour;
@@ -93,9 +94,9 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	private static final long serialVersionUID = 5053345286495358254L;
 
 	private List<String> listeAmis;
-	private boolean followingGolem;
 	private AgentRole role;
 	private List<Integer> indicesPatrolling;
+	private boolean measureTime;
 	
 	public AgentRole getRole() {
 		return role;
@@ -111,9 +112,9 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 		this.myMapMessage = new MapMessage();
-		this.followingGolem = false;
 		this.role = AgentRole.exploring;
 		this.indicesPatrolling = new ArrayList<Integer>();
+		this.measureTime = false;
 		
 		/************************************************
 		 * 
@@ -135,6 +136,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		lb.add(new ReturnBehaviour(this));
 		lb.add(new WaitingBehaviour(this));
 		lb.add(new PatrollingBehaviour(this));
+		// lb.add(new CheckBlockBehaviour(this));
 		// lb.add(new ExploMultiBehaviour(this, null));
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY
@@ -193,9 +195,11 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	public void setIndicesPatrolling(List<Integer> indexPatrolling) {
 		this.indicesPatrolling = indexPatrolling;
 	}
-
-//	public void setFollowingGolem(boolean followingGolem) {
-//		this.followingGolem = followingGolem;
-//	}
+	public boolean isMeasureTime() {
+		return measureTime;
+	}
+	public void setMeasureTime(boolean measureTime) {
+		this.measureTime = measureTime;
+	}
 	
 }

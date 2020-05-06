@@ -40,9 +40,15 @@ public class SendInfoBehaviour extends TickerBehaviour {
 	@Override
 	public void onTick() {
 		
+		
+		try {
+			System.out.println("AGENT : " + this.myAgent.getLocalName() + " ROLE : " + ((HunterAgent)this.myAgent).getRole().toString());
+		}
+		catch (Exception e) {}
+		
 		try {
 			if (((HunterAgent)this.myAgent).isBlocking()) {
-				this.stop();
+				// this.stop();
 				return;
 			}
 		}
@@ -90,11 +96,6 @@ public class SendInfoBehaviour extends TickerBehaviour {
 			//Mandatory to use this method (it takes into account the environment to decide if someone is reachable or not)
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 			// System.out.println("Current : " + myPosition + " Next : " + myNextNode);
-			
-//			try {
-//				System.out.println("AGENT : " + this.myAgent.getLocalName() + " ROLE : " + ((HunterAgent)this.myAgent).getRole().toString());
-//			}
-//			catch (Exception e) {}
 		}
 	}
 	
