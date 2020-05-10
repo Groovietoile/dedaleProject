@@ -7,6 +7,7 @@ import java.util.List;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
+import eu.su.mas.dedaleEtu.mas.behaviours.BlockGolemBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.CheckBlockBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploMultiBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
@@ -136,7 +137,8 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		lb.add(new ReturnBehaviour(this));
 		lb.add(new WaitingBehaviour(this));
 		lb.add(new PatrollingBehaviour(this));
-		// lb.add(new CheckBlockBehaviour(this));
+		lb.add(new CheckBlockBehaviour(this));
+		lb.add(new BlockGolemBehaviour(this));
 		// lb.add(new ExploMultiBehaviour(this, null));
 		/***
 		 * MANDATORY TO ALLOW YOUR AGENT TO BE DEPLOYED CORRECTLY

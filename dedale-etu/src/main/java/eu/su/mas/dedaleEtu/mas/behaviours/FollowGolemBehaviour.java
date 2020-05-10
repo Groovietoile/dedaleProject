@@ -42,7 +42,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			if (stenchExistance) { break; }
 		}
 		if (((HunterAgent)this.myAgent).getRole() != AgentRole.following)
-			roleBefore = ((HunterAgent)this.myAgent).getRole();
+			this.roleBefore = ((HunterAgent)this.myAgent).getRole();
 		if (stenchExistance) {
 //			System.out.println("AGENT " + this.myAgent.getLocalName() + obsRes);
 //			System.out.println(posToMove);
