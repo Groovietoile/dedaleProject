@@ -54,6 +54,7 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 		try {
 			if (!((HunterAgent)this.myAgent).isExploring()) {
 //				System.out.println("AGENT " + this.myAgent.getLocalName() + " J'AI TROUVÉ UN GOLEM !");
+				this.myMap.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap());
 				return; 
 			}
 		}

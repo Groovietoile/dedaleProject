@@ -16,7 +16,7 @@ public class CheckBlockBehaviour extends SimpleBehaviour {
 	 */
 	private static final long serialVersionUID = -7262549181358315079L;
 	private boolean finished;
-	private final long timeLimit = 5000;
+	private final long timeLimit = 10000;
 	private long start;
 	private String startPos;
 

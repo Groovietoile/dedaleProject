@@ -38,7 +38,8 @@ public class WaitingBehaviour extends SimpleBehaviour {
 
 	@Override
 	public void action() {
-		// TODO Auto-generated method stub
+		// Ajouter le truc pour envoyer les agents à aider si nécessaire
+		// Pour Ivan
 		try {
 			if (!((HunterAgent)this.myAgent).isWaiting()) { return; }
 		}

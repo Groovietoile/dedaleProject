@@ -84,6 +84,18 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 				   myNextNode = ((AbstractExploreMultiAgent)this.myAgent).getNextNode();
 			// System.out.println(senderCurrentNode + ',' + myNextNode + ',' + senderNextNode + ',' + myCurrentNode);
 			// System.out.println(senderCurrentNode.equals(myNextNode) && senderNextNode.equals(myCurrentNode));
+//			System.out.println("INFO DE SENDER :");
+//			System.out.println(msgContent.getAgentName());
+//			System.out.println(msgContent.getCurrentPosition());
+//			System.out.println(msgContent.getNextPosition());
+//			System.out.println(msgContent.getRole());
+//			
+//			System.out.println("INFO DE MOI :");
+//			System.out.println(this.myAgent.getLocalName());
+//			System.out.println(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getNextNode());
+//			System.out.println(myRole);
+//			
 			if ((senderCurrentNode.equals(myNextNode) || myNextNode.equals(myCurrentNode)) && senderNextNode.equals(myCurrentNode)) {
 				noNeighbours = !this.giveWay(myCurrentNode, senderCurrentNode);
 			}
@@ -168,8 +180,11 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 			}
 		}
 		if (neighbourRandomIndex != -1) {
-			((AbstractDedaleAgent)this.myAgent).moveTo(neighbourRandom);
+			String nextNodeCopy = ((HunterAgent)this.myAgent).getNextNode();
+			((HunterAgent)this.myAgent).setNextNode(neighbourRandom);
+			((HunterAgent)this.myAgent).moveTo(neighbourRandom);
 			this.myAgent.doWait(500);
+			// ((HunterAgent)this.myAgent).setNextNode(nextNodeCopy);
 		}
 		else { success = false; }
 		return success;

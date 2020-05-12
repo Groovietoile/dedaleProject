@@ -2,9 +2,11 @@ package eu.su.mas.dedaleEtu.mas.agents.dummies;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import dataStructures.tuple.Couple;
+import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.BlockGolemBehaviour;
@@ -22,6 +24,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.SendInfoBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.TestOdeurBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.WaitingBehaviour;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapMessage;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 
@@ -98,6 +101,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	private AgentRole role;
 	private List<Integer> indicesPatrolling;
 	private boolean measureTime;
+	private List<String> blockingPositions;
 	
 	public AgentRole getRole() {
 		return role;
@@ -116,6 +120,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		this.role = AgentRole.exploring;
 		this.indicesPatrolling = new ArrayList<Integer>();
 		this.measureTime = false;
+		this.blockingPositions = new ArrayList<String>();
 		
 		/************************************************
 		 * 
@@ -197,11 +202,44 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	public void setIndicesPatrolling(List<Integer> indexPatrolling) {
 		this.indicesPatrolling = indexPatrolling;
 	}
+	
 	public boolean isMeasureTime() {
 		return measureTime;
 	}
+	
 	public void setMeasureTime(boolean measureTime) {
 		this.measureTime = measureTime;
+	}
+	
+	public List<String> getBlockingPositions() {
+		return blockingPositions;
+	}
+
+	public void setBlockingPositions(List<String> blockingPositions) {
+		this.blockingPositions = blockingPositions;
+	}
+	
+	@Override
+	public boolean moveTo(String myDestination) {
+		List<Couple<String, List<Couple<Observation, Integer>>>> obs = ((AbstractDedaleAgent)this).observe();
+		this.exploreFromObs(obs);
+		return super.moveTo(myDestination);
+	}
+	
+	public void exploreFromObs(List<Couple<String, List<Couple<Observation, Integer>>>> obs) {
+		Iterator<Couple<String, List<Couple<Observation, Integer>>>> iter=obs.iterator();
+		while(iter.hasNext()){
+			String nodeId=iter.next().getLeft();
+			if (nodeId.equals(super.getCurrentPosition()))
+				continue;
+			if (!this.getMyMap().getListeDesNoeuds().get("closed").contains(nodeId) && !this.getMyMap().getListeDesNoeuds().get("open").contains(nodeId)) {
+				this.getMyMap().getListeDesNoeuds().get("open").add(nodeId);	
+			}
+			if (!this.getMyMap().getListeDesArcs().contains(new Couple<String, String>(super.getCurrentPosition(), nodeId)) &&
+				!this.getMyMap().getListeDesArcs().contains(new Couple<String, String>(nodeId, super.getCurrentPosition()))) {
+				this.getMyMap().getListeDesArcs().add(new Couple<String, String>(super.getCurrentPosition(), nodeId));
+			}
+		}
 	}
 	
 }

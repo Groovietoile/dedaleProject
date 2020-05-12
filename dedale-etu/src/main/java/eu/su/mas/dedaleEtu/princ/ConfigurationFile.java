@@ -100,7 +100,7 @@ public final class ConfigurationFile {
 	// public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExplo-2";
 	
 	// TP 5
-	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/treasureHunt/anyMap-hunt-1golem1agent-entities2";
+	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/treasureHunt/anyMap-hunt-1golem1agent-entities_test_without_golem";
 	
 	// Other agents
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/map2018-entities2";

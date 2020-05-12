@@ -113,7 +113,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 				// System.out.println("Je voudrais accéder alors vers un noeud " + this.nextNode);
 
 				this.myAgent.doWait(500);
-				((AbstractExploreMultiAgent)this.myAgent).moveTo(this.nextNode);
+				((HunterAgent)this.myAgent).moveTo(this.nextNode);
 			}
 		}
 		else {
@@ -154,7 +154,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 //				System.out.println("SO NEXT NODE IS : " + this.nextNode);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
 				this.myAgent.doWait(500);
-				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
+				((HunterAgent)this.myAgent).moveTo(nextNode);
 			}
 			else {
 				// On a déjà fermé tous les noeuds ouverts et on recommence par une autre sous-partie

@@ -155,6 +155,7 @@ public class MapMessage implements Serializable {
 		return shortestPath;
 	}
 	
+	// Améliorer la logique pour le calcul du centre
 	public String getCenter() {
 		return "5";
 	}
@@ -182,6 +183,12 @@ public class MapMessage implements Serializable {
 			return o1.compareTo(o2);
 		}
 
+	}
+	
+	// Pour Maria
+	// Une fonction qui indique si une carte courante est un arbre ou pas
+	public boolean isTree() {
+		return false;
 	}
 	
 }

@@ -97,7 +97,7 @@ public class ReturnBehaviour extends SimpleBehaviour {
 		if (this.path.size() > 0) {
 			try {
 				this.myAgent.doWait(500);
-				((AbstractDedaleAgent)this.myAgent).moveTo(this.path.get(0));
+				((HunterAgent)this.myAgent).moveTo(this.path.get(0));
 				this.path.remove(0);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(this.path.size() != 0 ? this.path.get(0) : ((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
 			}
