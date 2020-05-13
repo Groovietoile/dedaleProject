@@ -23,12 +23,18 @@ public class MapMessage implements Serializable {
 	private HashMap<String, ArrayList<String>> listeDesNoeuds;
 	private ArrayList<Couple<String, String>> listeDesArcs;
 	
+	private ArrayList<Tuple<String, Integer>> allnodes;
+	private HashMap<String, ArrayList<Tuple<String, Integer>>> voisins;
+	private boolean cycle;
 	
 	public MapMessage() {
 		listeDesNoeuds = new HashMap<String, ArrayList<String>>();
 		listeDesNoeuds.put("open", new ArrayList<String>());
 		listeDesNoeuds.put("closed", new ArrayList<String>());
 		listeDesArcs = new ArrayList<Couple<String, String>>();
+		allnodes = new ArrayList<>();
+		voisins = new HashMap<>();
+		cycle = false;
 	}
 
 
@@ -185,10 +191,108 @@ public class MapMessage implements Serializable {
 
 	}
 	
+	public class Tuple<X, Y> { 
+		private X x; 
+		private Y y;
+		
+		public Tuple(X x, Y y) {
+			this.x = x; 
+		    this.y = y; 
+		}
+		
+		public X getLeft() {
+			return x;
+		}
+		
+		public Y getRight() {
+			return y;
+		}
+
+		public void setLeft(X x) {
+			this.x = x;
+		}
+
+		public void setRight(Y y) {
+			this.y = y;
+		} 
+		  
+	} 
+	
 	// Pour Maria
 	// Une fonction qui indique si une carte courante est un arbre ou pas
 	public boolean isTree() {
-		return false;
+//		private HashMap<String, ArrayList<String>> listeDesNoeuds;
+//		private ArrayList<Couple<String, String>> listeDesArcs;
+		
+//		ArrayList<String> opennodes = this.listeDesNoeuds.get("open");
+//		ArrayList<String> closednodes = this.listeDesNoeuds.get("closed");
+//		
+//		for (Couple<String, String> arc : this.listeDesArcs) {
+//			mapRep.addEdge(arc.getLeft(), arc.getRight());
+//		}
+		
+		
+//		private ArrayList<Couple<String, Integer>> allnodes;
+//		private HashMap<String, ArrayList<Couple<String, Integer>>> voisins;
+		
+		//récupération de tous les noeuds
+		//ArrayList<String> allnodes = new ArrayList<>();
+		for (String key : this.listeDesNoeuds.keySet()) {
+			ArrayList<String> nodelist = this.listeDesNoeuds.get(key);
+			for (String node : nodelist) {
+				allnodes.add(new Tuple(node, 0));
+			}		
+		}
+		
+		//récupération de tous les voisins par noeud
+		//HashMap<String, ArrayList<String>> voisins = new HashMap<>();
+		for (Couple<String, String> arc : listeDesArcs) {
+			if (!voisins.containsKey(arc.getLeft())){
+				ArrayList<Tuple<String, Integer>> v = new ArrayList<>();
+				v.add(new Tuple(arc.getRight(),0));
+				voisins.put(arc.getLeft(), v);
+			}
+			else {
+				voisins.get(arc.getLeft()).add(new Tuple(arc.getRight(), 0));
+			}
+		}
+		
+		//DFS
+		for (Tuple<String, Integer> node : allnodes) {
+			//si node est pas marqué
+			if (node.getRight() == 0) {
+				exploDFS(node);
+			}	
+		}
+		
+		if (cycle) return false;
+		
+		//si jamais graphe pas connexe, vérifier :
+		//si un arc pas visité -> return false;
+		
+		return true;
 	}
 	
+	public void exploDFS(Tuple<String, Integer> node){
+		//marquer node
+		node.setRight(1);
+		
+		System.err.println("DFS : noeud marqué : "+node);
+		
+		//récupération des voisins
+		ArrayList<Tuple<String, Integer>> v = voisins.get(node);
+		
+		for (Tuple fils : v) {
+			//si le fils est pas marqué
+			if ((int)fils.getRight() == 0) { 
+				exploDFS(fils);
+			}	
+			//si fils déjà visité
+			else {
+				cycle = true;
+				System.err.println("DFS : cycle détecté");
+			}
+		
+		}
+	}
 }
