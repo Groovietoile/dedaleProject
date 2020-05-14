@@ -41,6 +41,13 @@ public class MapMessage implements Serializable {
 	public HashMap<String, ArrayList<String>> getListeDesNoeuds() {
 		return listeDesNoeuds;
 	}
+	
+	public ArrayList<String> getListeDesNoeudsMerged() {
+		ArrayList<String> res = new ArrayList<>();
+		res.addAll(this.listeDesNoeuds.get("open"));
+		res.addAll(this.listeDesNoeuds.get("closed"));
+		return res;
+	}
 
 
 	public void setListeDesNoeuds(HashMap<String, ArrayList<String>> listeDesNoeuds) {
@@ -157,6 +164,8 @@ public class MapMessage implements Serializable {
 			shortestPath.add(iter.next().getId());
 		}
 		dijkstra.clear();
+		if (shortestPath.size() == 0)
+			return null;
 		shortestPath.remove(0);//remove the current position
 		return shortestPath;
 	}
@@ -271,6 +280,88 @@ public class MapMessage implements Serializable {
 		//si un arc pas visité -> return false;
 		
 		return true;
+	}
+	
+
+	public MapMessage shallowCopy() {
+		MapMessage copy = new MapMessage();
+		for (String on: this.listeDesNoeuds.get("open"))
+			copy.listeDesNoeuds.get("open").add(on);
+		for (String cn: this.listeDesNoeuds.get("closed"))
+			copy.listeDesNoeuds.get("closed").add(cn);
+		for (Couple<String, String> edge: this.listeDesArcs)
+			copy.listeDesArcs.add(new Couple<String, String>(edge.getLeft(), edge.getRight()));
+		return copy;
+	}
+	
+	public MapMessage deleteNode(String idNode) {
+		MapMessage res = this.shallowCopy();
+		res.listeDesNoeuds.get("open").remove(idNode);
+		res.listeDesNoeuds.get("closed").remove(idNode);
+		Couple<String, String> tempEdge = null;
+		for (int i = 0; i < res.listeDesArcs.size(); i++) {
+			tempEdge = res.getListeDesArcs().get(i);
+			if (tempEdge.getLeft().equals(idNode) || tempEdge.getRight().equals(idNode)) {
+				res.listeDesArcs.remove(i);
+				i--;
+			}
+		}
+		return res;
+	}
+	
+	public MapMessage deleteNode(List<String> idsNodes) {
+		MapMessage res = this.shallowCopy();
+		for (String idNode: idsNodes)
+			res = res.deleteNode(idNode);
+		return res;
+	}
+	
+	public ArrayList<String> getAccessibleNodes(String idNode) {
+		ArrayList<String> res = new ArrayList<>();
+		res.add(idNode);
+		ArrayList<String> nodesToProcess = new ArrayList<>();
+		nodesToProcess.addAll(this.getNodeNeighbours(idNode));
+
+		while (nodesToProcess.size() > 0) {
+			String np = nodesToProcess.get(0);
+			nodesToProcess.remove(0);
+			for (String npNeigbour: this.getNodeNeighbours(np)) {
+				if (!nodesToProcess.contains(npNeigbour) && !res.contains(npNeigbour))
+					nodesToProcess.add(npNeigbour);
+			}
+			res.add(np);
+		}
+
+		return res;
+	}
+	
+	public MapMessage getAccessibleMap(String idNode) {
+		ArrayList<String> accessibleNodes = this.getAccessibleNodes(idNode);
+		ArrayList<String> nodesToDelete = new ArrayList<String>();
+		for (String node: this.getListeDesNoeudsMerged())
+			if (!accessibleNodes.contains(node))
+				nodesToDelete.add(node);
+		return this.deleteNode(nodesToDelete);
+	}
+	
+	public HashMap<String, Integer> degrees() {
+		HashMap<String, Integer> degrees = new HashMap<String, Integer>();
+		for (String node: this.getListeDesNoeudsMerged())
+			degrees.put(node, 0);
+		for (Couple<String, String> edge: this.getListeDesArcs()) {
+			degrees.put(edge.getLeft(), degrees.get(edge.getLeft()) + 1);
+			degrees.put(edge.getRight(), degrees.get(edge.getRight()) + 1);
+		}
+		return degrees;
+	}
+	
+	public Couple<String, Integer> degreeMax() {
+		HashMap<String, Integer> degrees = this.degrees();
+		Couple<String, Integer> res = new Couple<String, Integer>("", -1);
+		for (String key: degrees.keySet())
+			if (degrees.get(key) > res.getRight())
+				res = new Couple<String, Integer>(key, degrees.get(key));
+		return res;
 	}
 	
 	public void exploDFS(Tuple<String, Integer> node){

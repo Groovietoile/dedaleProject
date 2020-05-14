@@ -35,26 +35,38 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	 */
 	public static enum AgentRole {
 		blocking,
+		asking,
 		following,
 		patrolling,
 		waiting,
 		returning,
 		exploring
 	}
-	// exploring <= returning <= waiting <= patrolling <= following <= blocking
+	// exploring <= returning <= waiting <= patrolling <= following <= asking <= blocking
 	// AgentRole left, right;
 	// left <= right ?
 	//
 	private static HashMap<Couple<AgentRole, AgentRole>, Integer> agentsRolesRelNEq = null;
 	private static void initARR() {
 		HunterAgent.agentsRolesRelNEq = new HashMap<Couple<AgentRole, AgentRole>, Integer>();
+		
 
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.asking), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.following), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.patrolling), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.waiting), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.returning), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.blocking, AgentRole.exploring), -1);
 		
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.asking, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.asking, AgentRole.following), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.asking, AgentRole.patrolling), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.asking, AgentRole.waiting), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.asking, AgentRole.returning), -1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.asking, AgentRole.exploring), -1);
+		
+
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.asking), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.blocking), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.patrolling), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.waiting), -1);
@@ -62,24 +74,28 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.following, AgentRole.exploring), -1);
 		
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.asking), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.following), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.waiting), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.returning), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.patrolling, AgentRole.exploring), -1);
 		
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.asking), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.following), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.patrolling), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.returning), -1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.waiting, AgentRole.exploring), -1);
 		
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.asking), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.following), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.patrolling), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.waiting), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.returning, AgentRole.exploring), -1);
 		
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.blocking), 1);
+		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.asking), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.following), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.patrolling), 1);
 		HunterAgent.agentsRolesRelNEq.put(new Couple<AgentRole, AgentRole>(AgentRole.exploring, AgentRole.waiting), 1);
@@ -173,6 +189,10 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	
 	public boolean isBlocking() {
 		return this.role == AgentRole.blocking;
+	}
+	
+	public boolean isAskingForHelp() {
+		return this.role == AgentRole.asking;
 	}
 	
 	public boolean isFollowing() {
