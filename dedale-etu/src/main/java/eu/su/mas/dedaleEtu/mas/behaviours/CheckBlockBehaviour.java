@@ -1,10 +1,12 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
@@ -40,10 +42,14 @@ public class CheckBlockBehaviour extends SimpleBehaviour {
 		List<Couple<String, List<Couple<Observation, Integer>>>> obsRes = ((AbstractDedaleAgent)this.myAgent).observe();
 		boolean stenchExistance = false;
 		String posToMove = "";
+		List<String> tmpPath = new ArrayList<String>();
 		for (Couple<String, List<Couple<Observation, Integer>>> obsInPos : obsRes) {
 			for (Couple<Observation, Integer> eachObsInPos : obsInPos.getRight()) {
 				if (eachObsInPos.getLeft() == Observation.STENCH) {
 					stenchExistance = true;
+//					System.out.println(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+//					tmpPath = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getShortestPath(((AbstractDedaleAgent)this.myAgent).getCurrentPosition(), obsInPos.getLeft());
+//					posToMove = tmpPath.size() == 0 ? ((AbstractDedaleAgent)this.myAgent).getCurrentPosition() : tmpPath.get(0);
 					posToMove = obsInPos.getLeft();
 					break;
 				}

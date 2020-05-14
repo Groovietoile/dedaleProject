@@ -11,6 +11,9 @@ import jade.lang.acl.ACLMessage;
 /**
  * agent qui envoie un message à ses voisins lorsqu'il détecte une odeur/un golem
  */
+
+// à finir
+// Pour Ivan
 public class AskForHelp extends SimpleBehaviour{ //OneShotBehavior ?
 	
 	private boolean finished;

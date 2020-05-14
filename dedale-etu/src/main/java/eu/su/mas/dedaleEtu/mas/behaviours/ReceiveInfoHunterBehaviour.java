@@ -34,7 +34,7 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 	public void action() {
 		
 		try {
-			if (((HunterAgent)this.myAgent).isBlocking() || ((HunterAgent)this.myAgent).isFollowing()) {
+			if (((HunterAgent)this.myAgent).isBlocking()) {
 				this.finished = true;
 				return;
 			}

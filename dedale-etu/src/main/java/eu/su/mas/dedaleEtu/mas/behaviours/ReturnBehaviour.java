@@ -9,6 +9,7 @@ import eu.su.mas.dedaleEtu.mas.agents.dummies.AbstractExploreMultiAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.HunterAgent.AgentRole;
 import eu.su.mas.dedaleEtu.mas.knowledge.ExploMultiAgentMessageContent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -26,12 +27,14 @@ public class ReturnBehaviour extends SimpleBehaviour {
 	private List<String> path;
 	private List<String> centerNeighbours;
 	public static final String demandSubTree = "OK DONNE-MOI SOUS PARTIE ALORS !";
+	private MapRepresentation mapTemp;
 
 	public ReturnBehaviour(final AbstractDedaleAgent myAgent) {
 		super(myAgent);
 		this.finished = false;
 		this.center = null;
 		this.path = null;
+		this.mapTemp = null;
 	}
 
 	@Override
@@ -43,6 +46,24 @@ public class ReturnBehaviour extends SimpleBehaviour {
 			if (!e.getClass().getName().equals("java.lang.ClassCastException"))
 				System.out.println(e.getMessage());
 		}
+		
+		// if (this.mapTemp == null) {
+//			this.mapTemp = new MapRepresentation();
+//			ArrayList<String> nr = new ArrayList<String>();
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().getListeDesNoeudsMerged());
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().getAccessibleNodes("5"));
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().getAccessibleNodes("11"));
+//			nr.add("5");
+//			nr.add("12");
+//			nr.add("2");
+//			nr.add("11");
+//			this.mapTemp.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap().deleteNode(nr).getAccessibleMap("0"));
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().deleteNode(nr).getAccessibleNodes("6"));
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().deleteNode(nr).getAccessibleNodes("0"));
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().deleteNode("5").getShortestPath("2", "11"));
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().degrees());
+//			System.out.println(((AbstractExploreMultiAgent)this.myAgent).getMyMap().degreeMax());
+		// }
 
 		if (this.center == null)
 			this.center = ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getCenter();
