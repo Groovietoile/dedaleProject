@@ -62,7 +62,7 @@ public final class ConfigurationFile {
 	// public static String INSTANCE_TOPOLOGY=null;
 	
 	//TP5
-	public static String INSTANCE_TOPOLOGY="resources/topology/BinaryTree2";
+	public static String INSTANCE_TOPOLOGY="resources/topology/map2020-topologyExam1-tree";
 	
 	// Other topologies
 	//public static String INSTANCE_TOPOLOGY="resources/topology/map2018-topology-ica";
@@ -100,7 +100,7 @@ public final class ConfigurationFile {
 	// public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExplo-2";
 	
 	// TP 5
-	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/treasureHunt/anyMap-hunt-1golem1agent-entities2";
+	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/treasureHunt/map2020-entitiesTree";
 	
 	// Other agents
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/map2018-entities2";

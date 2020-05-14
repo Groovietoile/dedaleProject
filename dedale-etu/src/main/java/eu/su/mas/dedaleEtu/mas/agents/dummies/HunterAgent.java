@@ -145,7 +145,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 		 ************************************************/
 		
 		this.listeAmis = new ArrayList<String>();
-		String[] listeAmisPrevisionnelle = {"Explo1", "Explo2", "Explo3", "Explo4"};
+		String[] listeAmisPrevisionnelle = {"Explo1", "Explo2", "Explo3", "Explo4", "Explo5", "Explo6"};
 		for (int i = 0; i < listeAmisPrevisionnelle.length; i++) {
 			if (!listeAmisPrevisionnelle[i].equals(this.getLocalName()))
 				this.listeAmis.add(listeAmisPrevisionnelle[i]);
