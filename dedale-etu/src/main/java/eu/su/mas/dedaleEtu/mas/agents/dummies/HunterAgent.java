@@ -33,6 +33,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	/**
 	 * 
 	 */
+	private static final Integer waitingTime = 1000;
 	public static enum AgentRole {
 		blocking,
 		asking,
@@ -243,6 +244,7 @@ public class HunterAgent extends AbstractExploreMultiAgent {
 	public boolean moveTo(String myDestination) {
 		List<Couple<String, List<Couple<Observation, Integer>>>> obs = ((AbstractDedaleAgent)this).observe();
 		this.exploreFromObs(obs);
+		this.doWait(waitingTime);
 		return super.moveTo(myDestination);
 	}
 	

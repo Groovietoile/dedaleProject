@@ -183,7 +183,7 @@ public class ReceiveInfoHunterBehaviour extends SimpleBehaviour {
 			String nextNodeCopy = ((HunterAgent)this.myAgent).getNextNode();
 			((HunterAgent)this.myAgent).setNextNode(neighbourRandom);
 			((HunterAgent)this.myAgent).moveTo(neighbourRandom);
-			this.myAgent.doWait(500);
+			// this.myAgent.doWait(500);
 			// ((HunterAgent)this.myAgent).setNextNode(nextNodeCopy);
 		}
 		else { success = false; }

@@ -153,7 +153,7 @@ public class PatrollingBehaviour extends SimpleBehaviour {
 //				System.out.println("FULL PATH : " + pathMin);
 //				System.out.println("SO NEXT NODE IS : " + this.nextNode);
 				((AbstractExploreMultiAgent)this.myAgent).setNextNode(nextNode);
-				this.myAgent.doWait(500);
+				// this.myAgent.doWait(500);
 				((HunterAgent)this.myAgent).moveTo(nextNode);
 			}
 			else {
