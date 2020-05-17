@@ -70,6 +70,19 @@ public class ExploMultiBehaviour extends SimpleBehaviour {
 		}
 		else {
 			this.myMap.mergeWith(((AbstractExploreMultiAgent)this.myAgent).getMyMap());
+			for (String nodeClosed: ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getListeDesNoeuds().get("closed")) {
+				if (!this.closedNodes.contains(nodeClosed)) {
+					this.closedNodes.add(nodeClosed);
+				}
+				if (this.openNodes.contains(nodeClosed)) {
+					this.openNodes.remove(nodeClosed);
+				}
+			}
+			for (String nodeOpen: ((AbstractExploreMultiAgent)this.myAgent).getMyMap().getListeDesNoeuds().get("open")) {
+				if (!this.openNodes.contains(nodeOpen) && !this.closedNodes.contains(nodeOpen)) {
+					this.openNodes.add(nodeOpen);
+				}
+			}
 		}
 		
 		//0) Retrieve the current position

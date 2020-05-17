@@ -172,7 +172,7 @@ public class MapMessage implements Serializable {
 	
 	// Améliorer la logique pour le calcul du centre
 	public String getCenter() {
-		return "5";
+		return "2";
 	}
 	
 	public List<String> getNodeNeighbours(String idNode) {
